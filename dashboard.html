@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Heat Vulnerability Tool</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        :root {
+            --ink: #1a1410;
+            --paper: #faf8f5;
+            --warm-mid: #e8e2d9;
+            --accent: #c94a2a;
+            --accent-dark: #8b2a12;
+            --accent-pale: #f5e8e3;
+            --green: #2d6a4f;
+            --text-mid: #4a3f35;
+            --text-light: #7a6e64;
+            --border: #d4ccc2;
+            --serif: 'DM Serif Display', Georgia, serif;
+            --sans: 'DM Sans', sans-serif;
+            --mono: 'DM Mono', monospace;
+
+            --c-heat:    #c94a2a;
+            --c-pop:     #7b2d8b;
+            --c-socio:   #b8860b;
+            --c-mental:  #2d6a4f;
+            --c-built:   #1e5f8a;
+            --c-access:  #2e7d4f;
+            --c-composite: #1a1410;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: var(--sans); 
+            background: var(--paper);
+            color: var(--ink);
+            margin: 0; padding: 0; 
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        #sidebar { 
+            width: 390px; min-width: 390px;
+            background: var(--paper); 
+            padding: 24px 24px 40px;
+            border-right: 1px solid var(--border);
+            z-index: 1000; 
+            overflow-y: auto; 
+            display: flex; flex-direction: column;
+        }
+
+        .top-nav-group { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 22px; 
+        }
+
+        .nav-link {
+            flex: 1;
+            font-family: var(--mono); font-size: 0.62rem;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--paper); background: var(--ink);
+            text-decoration: none; padding: 10px 4px;
+            text-align: center; border-radius: 2px;
+            transition: 0.2s; display: block;
+        }
+        .nav-link:hover { background: var(--accent); }
+
+        h1 { 
+            font-family: var(--serif); font-size: 2rem; 
+            line-height: 1.1; margin: 0 0 8px; 
+        }
+        p.subtitle { 
+            font-size: 0.88rem; color: var(--text-mid); 
+            line-height: 1.55; margin: 0 0 2px;
+        }
+        
+        .control-group { 
+            margin-top: 18px; padding-top: 16px; 
+            border-top: 1px solid var(--border); 
+        }
+        .section-label {
+            font-family: var(--mono); font-size: 0.62rem;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            display: block; margin-bottom: 9px; color: var(--text-light); 
+        }
+        
+        /* ── SCENARIO BUTTONS ── */
+        .scenario-btn { 
+            display: block; width: 100%; 
+            padding: 9px 12px; margin-bottom: 5px; 
+            background: transparent; 
+            border: 1px solid var(--border); border-radius: 2px; 
+            cursor: pointer; text-align: left; 
+            font-family: var(--mono); font-size: 0.7rem; 
+            color: var(--text-mid); transition: 0.15s; 
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .scenario-btn:hover { background: var(--accent-pale); border-color: var(--accent); color: var(--accent-dark); }
+        .scenario-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+        .scenario-btn.policy-btn { border-left: 4px solid var(--green); }
+        .scenario-btn.policy-btn.active { background: var(--green); border-color: var(--green); }
+
+        /* ── THEME GRID ── */
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+
+        .theme-btn {
+            position: relative;
+            display: flex; flex-direction: column;
+            padding: 10px 11px; margin: 0;
+            border-radius: 2px; border: 1px solid var(--border);
+            cursor: pointer; background: transparent;
+            transition: 0.15s; text-align: left; width: 100%;
+            overflow: hidden;
+        }
+        .theme-btn::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--theme-color, var(--border));
+        }
+        .theme-btn .th-name {
+            font-family: var(--mono); font-size: 0.63rem;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--ink); line-height: 1.3; margin-bottom: 3px;
+        }
+        .theme-btn .th-vars {
+            font-family: var(--sans); font-size: 0.67rem;
+            color: var(--text-light); line-height: 1.25;
+        }
+        .theme-btn:hover { border-color: var(--theme-color, var(--border)); background: #f5f3f0; }
+        .theme-btn.active { background: var(--ink); border-color: var(--ink); }
+        .theme-btn.active .th-name,
+        .theme-btn.active .th-vars { color: var(--paper); }
+        .theme-btn.active::before { background: var(--theme-color, white); }
+
+        .theme-btn.span2 { grid-column: span 2; }
+
+        /* ── MODEL CARD ── */
+        .model-card {
+            background: var(--ink); color: var(--paper);
+            padding: 16px; border-radius: 3px; margin-top: 18px;
+        }
+        .model-card h3 {
+            font-family: var(--mono); font-size: 0.6rem;
+            letter-spacing: 0.15em; color: var(--accent);
+            margin: 0 0 10px; text-transform: uppercase;
+        }
+        .formula {
+            font-family: var(--mono); font-size: 0.7rem;
+            line-height: 1.65; color: rgba(250,248,245,0.8);
+        }
+        #debug-info {
+            font-family: var(--mono); font-size: 9px;
+            color: rgba(250,248,245,0.35); margin-top: 10px; text-transform: uppercase;
+        }
+
+        /* ── MAP ── */
+        #map { flex-grow: 1; height: 100%; background: var(--warm-mid); }
+        .leaflet-container { background: var(--paper) !important; }
+
+        /* ── LEGEND ── */
+        .legend { 
+            background: var(--paper); padding: 13px 15px; 
+            border: 1px solid var(--border); border-radius: 2px; 
+            font-family: var(--mono); font-size: 10.5px; color: var(--text-mid);
+            min-width: 155px;
+        }
+        .legend strong { display: block; margin-bottom: 7px; color: var(--ink); text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
+        .legend-row { display: flex; align-items: center; margin-bottom: 4px; gap: 7px; }
+        .legend-swatch { width: 12px; height: 12px; border-radius: 1px; flex-shrink: 0; }
+
+        /* ── POPUP ── */
+        .leaflet-popup-content-wrapper { background: var(--ink); color: var(--paper); border-radius: 3px; padding: 3px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .leaflet-popup-tip { background: var(--ink); }
+        .leaflet-popup-content { margin: 0 !important; }
+
+        .popup-inner { font-family: var(--mono); font-size: 11px; padding: 12px 14px; min-width: 220px; }
+        .popup-name { font-family: var(--serif); font-size: 16px; margin-bottom: 10px; color: var(--paper); }
+        .popup-active { border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 9px; margin-bottom: 9px; }
+        .popup-active-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 3px; }
+        .popup-active-score { font-size: 22px; color: #f4a261; line-height: 1; }
+        .popup-themes { display: flex; flex-direction: column; gap: 2px; }
+        
+        .popup-theme-row { 
+            display: flex; align-items: center; gap: 7px; 
+            text-decoration: none; color: inherit;
+            padding: 5px 6px; margin: 0 -6px;
+            border-radius: 3px; transition: background 0.2s;
+        }
+        .popup-theme-row:hover { background: rgba(255,255,255,0.1); cursor: pointer; }
+        
+        .popup-theme-label { width: 76px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; flex-shrink: 0; }
+        .popup-theme-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; }
+        .popup-theme-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+        .popup-theme-val { width: 28px; text-align: right; font-size: 10px; opacity: 0.8; }
+        
+        .popup-theme-row.active-row { background: rgba(255,255,255,0.06); }
+        .popup-theme-row.active-row .popup-theme-label { opacity: 1; color: #f4a261; }
+        .popup-theme-row.active-row .popup-theme-val { opacity: 1; color: #f4a261; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <div class="top-nav-group">
+        <a href="index.html" class="nav-link">← Explorer</a>
+        <a href="explain.html" class="nav-link">Methodology</a>
+    </div>
+    
+    <h1>Heat Risk Dashboard</h1>
+    <p class="subtitle">Neighborhood-level vulnerability across the Netherlands.</p>
+
+    <!-- COMPOSITE SCENARIOS -->
+    <div class="control-group">
+        <span class="section-label">Composite Risk Score</span>
+        <button class="scenario-btn active" data-layer="risk_2025_baseline" data-type="composite">2025 — Current Baseline</button>
+        <button class="scenario-btn" data-layer="risk_2050_baseline" data-type="composite">2050 — +1.5°C Warming</button>
+        <button class="scenario-btn" data-layer="risk_2075_baseline" data-type="composite">2075 — +3.0°C Warming</button>
+    </div>
+    <div class="control-group">
+        <span class="section-label">Policy Simulation</span>
+        <button class="scenario-btn policy-btn" data-layer="risk_2050_greening" data-type="composite">2050 + Stress Intervention</button>
+    </div>
+
+    <!-- THEMATIC VARIABLE LAYERS -->
+    <div class="control-group">
+        <span class="section-label">Variable Themes</span>
+        <div class="theme-grid">
+
+            <button class="theme-btn" style="--theme-color:var(--c-heat)"
+                    data-layer="theme_heat" data-type="theme" data-theme="heat">
+                <span class="th-name">Heat Exposure</span>
+                <span class="th-vars">PET temp · RIVM class</span>
+            </button>
+
+            <button class="theme-btn" style="--theme-color:var(--c-pop)"
+                    data-layer="theme_populations" data-type="theme" data-theme="populations">
+                <span class="th-name">Vulnerable Populations</span>
+                <span class="th-vars">Elderly · Children · Single HH · Frailty</span>
+            </button>
+
+            <button class="theme-btn" style="--theme-color:var(--c-socio)"
+                    data-layer="theme_socioeconomic" data-type="theme" data-theme="socioeconomic">
+                <span class="th-name">Socioeconomic</span>
+                <span class="th-vars">Income · Education · Social min · Rental</span>
+            </button>
+
+            <button class="theme-btn" style="--theme-color:var(--c-mental)"
+                    data-layer="theme_mental_health" data-type="theme" data-theme="mental_health">
+                <span class="th-name">Mental Health</span>
+                <span class="th-vars">Stress · Loneliness · Anxiety</span>
+            </button>
+
+            <button class="theme-btn" style="--theme-color:var(--c-built)"
+                    data-layer="theme_built_env" data-type="theme" data-theme="built_env">
+                <span class="th-name">Built Environment</span>
+                <span class="th-vars">Old bldgs · Gas use · No indoor cooling</span>
+            </button>
+
+            <button class="theme-btn" style="--theme-color:var(--c-access)"
+                    data-layer="theme_access" data-type="theme" data-theme="access">
+                <span class="th-name">Access & Green</span>
+                <span class="th-vars">GP dist · Hospital · Parks · Cooling</span>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- MODEL CARD -->
+    <div class="model-card">
+        <h3>Composite 6-Factor Model</h3>
+        <div class="formula">
+            Vulnerability ≈ f(<br>
+            &nbsp;&nbsp;<span style="color:#f4a261">PET temp</span>,
+            <span style="color:#d4a8e8">Elderly%</span>,<br>
+            &nbsp;&nbsp;<span style="color:#ffd080">Low-Income%</span>,
+            <span style="color:#d4a8e8">Children%</span>,<br>
+            &nbsp;&nbsp;<span style="color:#90b8d8">Pre-2010 Bldgs</span>,<br>
+            &nbsp;&nbsp;<span style="color:#7fcfaa">Stress Index</span><br>
+            )
+        </div>
+        <div id="debug-info">Loading data…</div>
+    </div>
+</div>
+
+<div id="map"></div>
+
+<script>
+// ─── THEME DEFINITIONS ────────────────────────────────────────────────────────
+const THEME_DEFS = {
+    composite:    { label: 'Composite Risk',         color: '#1a1410' },
+    heat:         { label: 'Heat Exposure',           color: '#c94a2a' },
+    populations:  { label: 'Vulnerable Populations',  color: '#7b2d8b' },
+    socioeconomic:{ label: 'Socioeconomic',           color: '#b8860b' },
+    mental_health:{ label: 'Mental Health',           color: '#2d6a4f' },
+    built_env:    { label: 'Built Environment',       color: '#1e5f8a' },
+    access:       { label: 'Access & Green Space',    color: '#2e7d4f' },
+};
+
+// All popup themes in display order
+const POPUP_THEMES = [
+    { key:'theme_heat',         label:'Heat',     theme:'heat' },
+    { key:'theme_populations',  label:'Popul.',   theme:'populations' },
+    { key:'theme_socioeconomic',label:'Socio.',   theme:'socioeconomic' },
+    { key:'theme_mental_health',label:'Mental',   theme:'mental_health' },
+    { key:'theme_built_env',    label:'Built',    theme:'built_env' },
+    { key:'theme_access',       label:'Access',   theme:'access' },
+];
+
+// ─── COLOR RAMPS (index 0 = safe/low, index 4 = critical/high) ───────────────
+const RAMPS = {
+    composite:    ['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'],
+    heat:         ['#fff5f0','#fcc5a1','#fc8c59','#e83f1b','#7f0000'],
+    populations:  ['#f7f0fb','#d4a8e8','#9e4dbb','#6a1b8a','#330044'],
+    socioeconomic:['#fffde7','#ffe27a','#f0a500','#b36b00','#5c3200'],
+    mental_health:['#f0faf4','#a8ddb5','#43a866','#1a6e3a','#083820'],
+    built_env:    ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
+    access:       ['#f0faf4','#b7e4c7','#52b788','#1b7a40','#081c15'],
+};
+
+function rampColor(score, themeName) {
+    if (score == null || isNaN(score)) return '#e8e2d9';
+    const ramp = RAMPS[themeName] || RAMPS.composite;
+    const idx  = Math.min((score / 100) * (ramp.length - 1), ramp.length - 1.001);
+    const lo = Math.floor(idx), hi = Math.ceil(idx);
+    return lo === hi ? ramp[lo] : interpolateHex(ramp[lo], ramp[hi], idx - lo);
+}
+
+function interpolateHex(a, b, t) {
+    const parse = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+    const [r1,g1,b1] = parse(a), [r2,g2,b2] = parse(b);
+    return '#' + [r1+(r2-r1)*t, g1+(g2-g1)*t, b1+(b2-b1)*t]
+        .map(v => Math.round(v).toString(16).padStart(2,'0')).join('');
+}
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+var currentLayer = 'risk_2025_baseline';
+var currentType  = 'composite';
+var currentTheme = 'composite';
+
+// ─── MAP ──────────────────────────────────────────────────────────────────────
+var map = L.map('map', { zoomControl: false }).setView([52.1326, 5.2913], 7);
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO'
+}).addTo(map);
+
+// ─── STYLING ─────────────────────────────────────────────────────────────────
+function styleFeature(feature) {
+    const score = feature.properties[currentLayer];
+    return {
+        fillColor:   rampColor(score, currentTheme),
+        weight:      0.4, opacity: 1,
+        color:       '#1a1410',
+        fillOpacity: 0.82
+    };
+}
+
+function buildPopup(feature) {
+    const p    = feature.properties;
+    const name = p.buurtnaam || 'Neighborhood';
+    const fmt  = v => (v != null && !isNaN(v)) ? Math.round(v) : '—';
+    const activeScore = fmt(p[currentLayer]);
+    const activeLabel = currentType === 'composite'
+        ? 'Composite Risk Score'
+        : THEME_DEFS[currentTheme]?.label || 'Score';
+
+    const bars = POPUP_THEMES.map(t => {
+        const val  = p[t.key];
+        const num  = (val != null && !isNaN(val)) ? Math.round(val) : null;
+        const pct  = num != null ? num : 0;
+        const col  = THEME_DEFS[t.theme]?.color || '#888';
+        const isActive = currentType === 'theme' && currentLayer === t.key;
+        
+        return `<a href="explain.html#theme-${t.theme}" title="Read more about ${t.label} risk" class="popup-theme-row${isActive ? ' active-row' : ''}">
+            <span class="popup-theme-label">${t.label}</span>
+            <div class="popup-theme-bar-track">
+                <div class="popup-theme-bar-fill" style="width:${pct}%;background:${col}"></div>
+            </div>
+            <span class="popup-theme-val">${num != null ? num : '—'}</span>
+        </a>`;
+    }).join('');
+
+    return `<div class="popup-inner">
+        <div class="popup-name">${name}</div>
+        <div class="popup-active">
+            <div class="popup-active-label">${activeLabel}</div>
+            <div class="popup-active-score">${activeScore}<span style="font-size:11px;opacity:.5"> / 100</span></div>
+        </div>
+        <div class="popup-themes">${bars}</div>
+    </div>`;
+}
+
+function onEachFeature(feature, layer) {
+    layer.bindPopup(() => buildPopup(feature), { maxWidth: 280 });
+    layer.on('mouseover', function() { this.setStyle({ weight: 2, fillOpacity: 1 }); });
+    layer.on('mouseout',  function() { this.setStyle({ weight: 0.4, fillOpacity: 0.82 }); });
+}
+
+// ─── DATA LOAD ────────────────────────────────────────────────────────────────
+var geojsonLayer, geojsonData;
+
+fetch('map_scenarios.geojson')
+    .then(r => r.json())
+    .then(data => {
+        geojsonData = data;
+        renderLayer();
+        document.getElementById('debug-info').innerHTML =
+            `${data.features.length.toLocaleString()} neighborhoods · 10 layers`;
+    })
+    .catch(() => {
+        document.getElementById('debug-info').innerHTML = 'Data load error';
+    });
+
+function renderLayer() {
+    if (geojsonLayer) map.removeLayer(geojsonLayer);
+    geojsonLayer = L.geoJson(geojsonData, {
+        style: styleFeature,
+        onEachFeature: onEachFeature
+    }).addTo(map);
+    updateLegend();
+}
+
+// ─── LEGEND ───────────────────────────────────────────────────────────────────
+var legendControl = L.control({ position: 'bottomright' });
+legendControl.onAdd = function() {
+    this._div = L.DomUtil.create('div', 'legend');
+    return this._div;
+};
+legendControl.addTo(map);
+
+function updateLegend() {
+    const themeLabel = THEME_DEFS[currentTheme]?.label || 'Risk';
+    const ramp = RAMPS[currentTheme] || RAMPS.composite;
+    const labels = ['0–20 Minimal', '20–40 Low', '40–60 Moderate', '60–80 High', '80–100 Critical'];
+    let html = `<strong>${themeLabel}</strong>`;
+    ramp.forEach((color, i) => {
+        html += `<div class="legend-row"><div class="legend-swatch" style="background:${color}"></div>${labels[i]}</div>`;
+    });
+    legendControl._div.innerHTML = html;
+}
+
+// ─── BUTTON EVENTS ────────────────────────────────────────────────────────────
+document.querySelectorAll('.scenario-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.scenario-btn, .theme-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentLayer = this.dataset.layer;
+        currentType  = 'composite';
+        currentTheme = 'composite';
+        if (geojsonData) renderLayer();
+    });
+});
+
+document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.scenario-btn, .theme-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentLayer = this.dataset.layer;
+        currentType  = 'theme';
+        currentTheme = this.dataset.theme;
+        if (geojsonData) renderLayer();
+    });
+});
+</script>
+</body>
+</html>
