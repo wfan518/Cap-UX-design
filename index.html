@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate & Health — Heat Vulnerability in the Netherlands</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+    :root {
+        --ink:#1a1410; --paper:#faf8f5; --warm:#e8e2d9;
+        --accent:#c94a2a; --accent-pale:#f5e8e3; --green:#2d6a4f;
+        --mid:#4a3f35; --light:#7a6e64; --border:#d4ccc2;
+        --serif:'DM Serif Display',Georgia,serif;
+        --sans:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+        --w:1200px;
+        --c-heat:#c94a2a; --c-pop:#7b2d8b; --c-socio:#b8860b;
+        --c-mental:#2d6a4f; --c-built:#1e5f8a; --c-access:#2e7d4f;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6}
+
+    /* ── NAV ── */
+    nav{
+        position:fixed;top:0;left:0;right:0;height:52px;
+        background:rgba(250,248,245,0.94);backdrop-filter:blur(10px);
+        border-bottom:1px solid var(--border);z-index:1000;
+        display:flex;align-items:center;
+    }
+    .nav-inner{
+        max-width:var(--w);margin:0 auto;padding:0 32px;width:100%;
+        display:flex;align-items:center;justify-content:space-between;
+    }
+    .nav-logo{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase}
+    .nav-links{display:flex;gap:20px;align-items:center}
+    .nav-lk{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);text-decoration:none;transition:.2s}
+    .nav-lk:hover{color:var(--ink)}
+    .nav-btn{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;background:var(--ink);color:var(--paper);text-decoration:none;padding:8px 16px;border-radius:2px;transition:.2s}
+    .nav-btn:hover{background:var(--accent)}
+
+    /* ── HERO ── */
+    #hero{
+        min-height:100vh;padding:100px 32px 64px;
+        display:flex;align-items:center;
+        max-width:var(--w);margin:0 auto;gap:64px;
+    }
+    .hero-left{flex:1;max-width:580px}
+    .hero-tag{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;display:block}
+    .hero-left h1{font-family:var(--serif);font-size:clamp(2.6rem,4.5vw,4rem);line-height:1.08;margin-bottom:24px}
+    .hero-left h1 em{font-style:italic;color:var(--accent)}
+    .hero-left p{font-size:1.05rem;color:var(--mid);line-height:1.72;margin-bottom:36px;max-width:500px}
+    .hero-stats{
+        display:flex;gap:32px;padding:24px 0;
+        border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+        margin-bottom:40px;
+    }
+    .stat-n{display:block;font-family:var(--serif);font-size:2.2rem;line-height:1}
+    .stat-l{display:block;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);margin-top:4px}
+    .hero-cta{
+        display:inline-block;font-family:var(--mono);font-size:0.7rem;
+        letter-spacing:0.1em;text-transform:uppercase;
+        background:var(--ink);color:var(--paper);
+        text-decoration:none;padding:14px 28px;border-radius:2px;transition:.2s;
+    }
+    .hero-cta:hover{background:var(--accent)}
+    .hero-right{flex:0 0 360px}
+    .heat-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+    .heat-cell{aspect-ratio:1;border-radius:2px;animation:hpulse var(--d,3s) ease-in-out infinite var(--dl,0s)}
+    @keyframes hpulse{0%,100%{opacity:var(--mo,.4)}50%{opacity:1}}
+    .heat-caption{margin-top:10px;font-family:var(--mono);font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);text-align:center}
+
+    /* ── PROBLEM ── */
+    #problem{background:var(--ink);color:var(--paper);padding:88px 32px}
+    .sec-inner{max-width:var(--w);margin:0 auto}
+    .sec-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,248,245,.4);margin-bottom:12px;display:block}
+    .sec-h{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.15;margin-bottom:14px}
+    .sec-sub{font-size:1rem;color:rgba(250,248,245,.6);max-width:580px;line-height:1.65;margin-bottom:52px}
+    .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+    .pillar{
+        padding:36px 28px;border:1px solid rgba(255,255,255,.07);
+        background:rgba(255,255,255,.03);
+    }
+    .p-num{font-family:var(--serif);font-size:3rem;color:var(--accent);line-height:1;margin-bottom:14px;opacity:.55}
+    .pillar h3{font-family:var(--serif);font-size:1.35rem;color:var(--paper);margin-bottom:12px;line-height:1.2}
+    .pillar p{font-size:.9rem;color:rgba(250,248,245,.6);line-height:1.65}
+    .p-stat{
+        margin-top:20px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);
+        font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;
+        color:var(--accent);
+    }
+
+    /* ── EXPLORER ── */
+    #explorer{padding:88px 32px}
+
+    /* Controls (dropdowns) */
+    select{
+        font-family:var(--mono);font-size:.7rem;letter-spacing:.04em;
+        padding:9px 14px;border:1px solid var(--border);border-radius:2px;
+        background:var(--paper);color:var(--ink);cursor:pointer;min-width:240px;
+    }
+    select:focus{outline:none;border-color:var(--ink)}
+
+    /* Step track */
+    .exp-header-controls {
+        display: flex; justify-content: space-between; align-items: flex-end; 
+        margin-top: 28px; flex-wrap: wrap; gap: 16px;
+    }
+    .step-track{
+        display:flex;border:1px solid var(--border);border-radius:2px;overflow:hidden;
+        max-width:580px;margin-bottom:0; flex-grow: 1;
+    }
+    .step-item{
+        flex:1;padding:11px 14px;
+        font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+        color:var(--light);border-right:1px solid var(--border);
+        display:flex;align-items:center;gap:8px;transition:.2s;
+    }
+    .step-item:last-child{border-right:none}
+    .step-item.active{background:var(--ink);color:var(--paper)}
+    .step-item.done{background:var(--warm);color:var(--mid)}
+    .s-dot{
+        width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.1);
+        display:flex;align-items:center;justify-content:center;
+        font-size:9px;font-weight:600;flex-shrink:0;
+    }
+    .step-item.active .s-dot{background:var(--accent);color:#fff}
+    .step-item.done .s-dot{background:var(--green);color:#fff}
+
+    /* province grid */
+    .prov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:24px}
+    .prov-btn{
+        padding:16px 40px 16px 14px;background:transparent;border:1px solid var(--border);
+        border-radius:2px;cursor:pointer;text-align:left;transition:.15s;
+        position:relative;overflow:hidden;
+    }
+    .prov-btn::after{
+        content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+        background:var(--accent);transform:scaleY(0);transition:transform .2s;transform-origin:center;
+    }
+    .prov-btn:hover{border-color:var(--accent);background:var(--accent-pale)}
+    .prov-btn:hover::after{transform:scaleY(1)}
+    .prov-btn.active{background:var(--ink);border-color:var(--ink)}
+    .prov-btn.active::after{transform:scaleY(1)}
+    .pb-code{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--light);display:block;margin-bottom:3px}
+    .pb-name{font-size:.95rem;font-weight:500;display:block;line-height:1.2}
+    .pb-city{font-size:.72rem;color:var(--light);display:block;margin-top:2px}
+    .prov-score{
+        position:absolute; top:18px; right:14px;
+        font-family:var(--mono); font-size:1rem; color:var(--accent); font-weight:500;
+    }
+    .prov-btn.active .pb-code,.prov-btn.active .pb-city{color:rgba(250,248,245,.4)}
+    .prov-btn.active .pb-name{color:var(--paper)}
+    .prov-btn.active .prov-score{color:#f4a261;}
+
+    /* data status */
+    .data-status{
+        font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;
+        color:var(--light);padding:18px 0;
+    }
+
+    /* ── CONTENT PANELS ── */
+    .ec-state{display:none;animation:fadeUp .28s ease}
+    .ec-state.on{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Municipality panel */
+    .muni-panel-head{
+        display:flex;align-items:center;justify-content:space-between;
+        margin-bottom:20px;flex-wrap:wrap;gap:12px;padding-top:28px;
+        border-top:1px solid var(--border);
+    }
+    .muni-panel-title{font-family:var(--serif);font-size:1.6rem}
+    .muni-panel-meta{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-top:2px}
+    .muni-controls{display:flex;gap:10px;align-items:center}
+
+    /* Municipality ranked cards */
+    .muni-list{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:8px}
+    .muni-card{
+        display:flex;align-items:center;gap:14px;
+        padding:13px 16px;border:1px solid var(--border);
+        border-radius:2px;cursor:pointer;transition:.15s;background:transparent;
+        text-align:left;width:100%;
+    }
+    .muni-card:hover{border-color:var(--accent);background:var(--accent-pale)}
+    .mc-rank{font-family:var(--mono);font-size:.65rem;color:var(--light);width:20px;flex-shrink:0;text-align:center}
+    .mc-name{font-size:.92rem;font-weight:500;flex:1;color:var(--ink)}
+    .mc-badges{display:flex;gap:3px;flex-shrink:0}
+    .mc-badge{
+        font-family:var(--mono);font-size:.55rem;letter-spacing:.05em;text-transform:uppercase;
+        padding:2px 5px;border-radius:1px;color:#fff;
+    }
+    .mc-score{font-family:var(--mono);font-size:.75rem;color:var(--accent);flex-shrink:0;width:28px;text-align:right}
+
+    /* Results panel */
+    .results-head{
+        display:flex;align-items:flex-start;justify-content:space-between;
+        padding-top:28px;border-top:1px solid var(--border);margin-bottom:22px;
+        flex-wrap:wrap;gap:12px;
+    }
+    .back-btn{
+        font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+        padding:8px 14px;border:1px solid var(--border);border-radius:2px;
+        background:transparent;cursor:pointer;color:var(--mid);transition:.15s;flex-shrink:0;
+    }
+    .back-btn:hover{border-color:var(--ink);color:var(--ink)}
+    .results-layout{display:grid;grid-template-columns:1fr 370px;gap:24px;align-items:start}
+
+    /* Map */
+    #r-map{
+        height:420px;border:1px solid var(--border);border-radius:2px;
+        margin-bottom:16px;
+    }
+    .leaflet-container{background:var(--paper)!important}
+
+    /* Theme tabs */
+    .theme-tabs{display:flex;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px}
+    .theme-tab{
+        flex:1;padding:9px 4px;background:transparent;border:none;border-right:1px solid var(--border);
+        cursor:pointer;font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;
+        color:var(--light);transition:.15s;text-align:center;line-height:1.3;
+    }
+    .theme-tab:last-child{border-right:none}
+    .theme-tab:hover{background:var(--warm)}
+    .theme-tab.on{background:var(--ink);color:var(--paper)}
+    .t-dot{display:block;width:6px;height:6px;border-radius:50%;background:currentColor;margin:0 auto 4px}
+
+    /* Neighborhood ranking list */
+    .rank-list{display:flex;flex-direction:column;gap:4px}
+    .rank-row{
+        display:flex;align-items:center;gap:10px;
+        padding:9px 12px;background:var(--warm);border-radius:2px;
+    }
+    .r-pos{font-family:var(--mono);font-size:.62rem;color:var(--light);width:18px;flex-shrink:0;text-align:center}
+    .r-name{font-size:.86rem;flex:1;color:var(--ink)}
+    .r-bar{width:80px;height:5px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden;flex-shrink:0}
+    .r-fill{height:100%;border-radius:2px;transition:width .4s}
+    .r-val{font-family:var(--mono);font-size:.7rem;color:var(--mid);width:26px;text-align:right}
+
+    /* Right panel */
+    .overview-card{background:var(--ink);color:var(--paper);padding:20px;border-radius:2px;margin-bottom:14px}
+    .ov-name{font-family:var(--serif);font-size:1.4rem;margin-bottom:2px}
+    .ov-meta{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(250,248,245,.35);margin-bottom:16px;display:block}
+    .ov-rows{display:flex;flex-direction:column;gap:7px}
+    .ov-row{display:flex;align-items:center;gap:8px}
+    .ov-label{font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.04em;color:rgba(250,248,245,.5);width:70px;flex-shrink:0}
+    .ov-track{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+    .ov-fill{height:100%;border-radius:2px}
+    .ov-val{font-family:var(--mono);font-size:.65rem;color:rgba(250,248,245,.7);width:24px;text-align:right}
+
+    /* Interventions */
+    .int-title{
+        font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--light);margin-bottom:10px;
+    }
+    .int-card{border:1px solid var(--border);border-radius:2px;margin-bottom:7px;overflow:hidden}
+    .int-bar{height:3px}
+    .int-body{padding:13px 15px}
+    .int-theme{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:5px;display:block}
+    .int-name{font-size:.88rem;font-weight:500;color:var(--ink);margin-bottom:5px;line-height:1.3}
+    .int-desc{font-size:.78rem;color:var(--mid);line-height:1.5}
+    .int-type{
+        display:inline-block;font-family:var(--mono);font-size:.52rem;letter-spacing:.06em;
+        text-transform:uppercase;padding:2px 6px;background:var(--warm);
+        color:var(--light);border-radius:1px;margin-top:7px;
+    }
+
+    /* Footer */
+    footer{background:var(--ink);color:rgba(250,248,245,.4);padding:36px 32px;text-align:center}
+    footer p{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em}
+    footer a{color:rgba(250,248,245,.6);text-decoration:none}
+    footer a:hover{color:var(--paper)}
+
+    /* Responsive */
+    @media(max-width:960px){
+        #hero{flex-direction:column;gap:40px;min-height:auto;padding-top:88px}
+        .hero-right{flex:none;width:100%}
+        .pillars,.prov-grid{grid-template-columns:repeat(2,1fr)}
+        .results-layout{grid-template-columns:1fr}
+        .muni-list{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+        .pillars,.prov-grid{grid-template-columns:1fr}
+        #hero{padding:80px 20px 48px}.nav-inner,section,#explorer,#problem{padding-left:20px;padding-right:20px}
+    }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <span class="nav-logo">Heat &amp; Health NL</span>
+        <div class="nav-links">
+            <a href="explain.html" class="nav-lk">Methodology</a>
+            <a href="#explorer" class="nav-lk">Explore</a>
+            <a href="dashboard.html" class="nav-btn">Full Dashboard →</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div style="max-width:var(--w);margin:0 auto">
+<section id="hero">
+    <div class="hero-left">
+        <span class="hero-tag">Climate Health Research · Netherlands 2025</span>
+        <h1>Heat does not<br>discriminate —<br><em>but vulnerability does.</em></h1>
+        <p>As climate change intensifies heat waves across the Netherlands, health risk concentrates in neighborhoods shaped by poverty, aging, social isolation, and housing that traps heat. This tool works as an interactive decision-support prototype for Dutch municipalities and GGD advisors to help identify vulnerable neighbourhoods, explain key risk drivers, and connect heat-health vulnerability to targeted local interventions.</p>
+        <div class="hero-stats">
+            <div>
+                <span class="stat-n">11,554</span>
+                <span class="stat-l">Neighborhoods</span>
+            </div>
+            <div>
+                <span class="stat-n">5</span>
+                <span class="stat-l">Vulnerability dimensions</span>
+            </div>
+            <div>
+                <span class="stat-n">2025–75</span>
+                <span class="stat-l">Scenarios</span>
+            </div>
+        </div>
+        <a href="#explorer" class="hero-cta">Start with your municipality</a>
+            <p class="hero-note">
+                Select a province to begin. The tool ranks municipalities by relative heat-health vulnerability.
+            </p>
+    </div>
+    <div class="hero-right">
+        <div class="heat-grid" id="heatGrid"></div>
+        <div class="heat-caption">Simulated heat vulnerability by neighborhood</div>
+    </div>
+</section>
+</div>
+
+<!-- ═══════════ PROBLEM ═══════════ -->
+<section id="problem">
+    <div class="sec-inner">
+        <span class="sec-tag">The policy problem</span>
+        <h2 class="sec-h">Heat-health risk is uneven,<br>local, and preventable</h2>
+        <p class="sec-sub">
+           Rising temperatures do not affect all neighbourhoods equally. Vulnerability is shaped by exposure, age, income, health conditions, housing quality, green space, and access to support.
+        </p>
+        <div class="pillars">
+            <div class="pillar">
+                <div class="p-num">01</div>
+                <h3>Heat exposure is spatially unequal</h3>
+                <p>Dense urban neighborhoods with little vegetation and high shares of dark surfaces experience Physiological Equivalent Temperatures up to 8°C higher than surrounding areas. Green space, parks, and water reduce this — but are unequally distributed across the country.</p>
+                <div class="p-stat">↑ 8°C PET gap between most and least exposed neighborhoods in major cities</div>
+            </div>
+            <div class="pillar">
+                <div class="p-num">02</div>
+                <h3>The most vulnerable cannot adapt alone</h3>
+                <p>Elderly residents, young children, people with frail health, and those experiencing chronic stress or loneliness face compounding barriers to self-protection. Low incomes mean no access to cooling, while social isolation means no one to check in during heat alerts.</p>
+                <div class="p-stat">↑ 3× higher hospitalization rate for residents aged 75+ during heat waves</div>
+            </div>
+            <div class="pillar">
+                <div class="p-num">03</div>
+                <h3>Housing and infrastructure shape indoor risk</h3>
+                <p>Neighborhoods dominated by pre-2010 housing — built before modern thermal insulation standards — become indoor heat traps during prolonged heat events. Rental-heavy neighborhoods offer residents little control over retrofitting or installing cooling.</p>
+                <div class="p-stat">↑ Pre-2010 buildings show highest rates of inability to find indoor cooling</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ EXPLORER ═══════════ -->
+<section id="explorer">
+    <div class="sec-inner">
+        <span class="sec-tag" style="color:var(--light)">The decision-support tool</span>
+        <h2 class="sec-h" style="color:var(--ink)">Select a region to begin</h2>
+        <p style="font-size:1rem;color:var(--mid);max-width:620px;line-height:1.65;margin-bottom:0">
+            Choose a province and municipality to view neighbourhood-level vulnerability rankings, 
+            dominant risk drivers, and possible municipal interventions.
+        </p>
+
+        <!-- Step indicator and Province Sort -->
+        <div class="exp-header-controls">
+            <div class="step-track">
+                <div class="step-item active" id="si1"><span class="s-dot">1</span>Select province</div>
+                <div class="step-item" id="si2"><span class="s-dot">2</span>Review ranking</div>
+                <div class="step-item" id="si3"><span class="s-dot">3</span>Diagnose risk</div>
+            </div>
+            
+            <select id="provSort" style="display: none; margin: 0;">
+                <option value="composite">Rank Provinces by: Composite Risk</option>
+                <option value="theme_heat">Rank by: Heat Exposure</option>
+                <option value="theme_populations">Rank by: Vulnerable Populations</option>
+                <option value="theme_socioeconomic">Rank by: Socioeconomic Deprivation</option>
+                <option value="theme_mental_health">Rank by: Mental Health</option>
+                <option value="theme_built_access">Rank by: Built Environment & Access</option>
+            </select>
+        </div>
+
+        <!-- Province grid (always visible) -->
+        <div class="prov-grid" id="provGrid"></div>
+
+        <!-- Data status -->
+        <div class="data-status" id="dataStatus">Loading neighborhood data…</div>
+
+        <!-- ── PANEL: Municipality list ── -->
+        <div class="ec-state" id="panelMuni">
+            <div class="muni-panel-head">
+                <div>
+                    <div class="muni-panel-title" id="muniPanelTitle"></div>
+                    <div class="muni-panel-meta" id="muniPanelMeta"></div>
+                </div>
+                <div class="muni-controls">
+                    <select id="muniSort">
+                        <option value="composite">Sort by: Composite Risk</option>
+                        <option value="theme_heat">Sort by: Heat Exposure</option>
+                        <option value="theme_populations">Sort by: Vulnerable Populations</option>
+                        <option value="theme_socioeconomic">Sort by: Socioeconomic Deprivation</option>
+                        <option value="theme_mental_health">Sort by: Mental Health</option>
+                        <option value="theme_built_access">Rank by: Built Environment & Access</option>
+                    </select>
+                </div>
+            </div>
+            <div class="muni-list" id="muniList"></div>
+        </div>
+
+        <!-- ── PANEL: Results ── -->
+        <div class="ec-state" id="panelResults">
+            <div class="results-head">
+                <div>
+                    <div style="font-family:var(--serif);font-size:1.7rem" id="rMuniName"></div>
+                    <div style="font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-top:2px" id="rMuniMeta"></div>
+                </div>
+                <button class="back-btn" id="backBtn">← Back to municipalities</button>
+            </div>
+
+            <div class="results-layout">
+                <!-- Left: map + rankings -->
+                <div>
+                    <div id="r-map"></div>
+                    <div class="theme-tabs" id="themeTabs"></div>
+                    <div class="rank-list" id="rankList"></div>
+                </div>
+                <!-- Right: overview + interventions -->
+                <div>
+                    <div class="overview-card" id="overviewCard"></div>
+                    <div class="int-title">Possible municipal interventions</div>
+                    <div id="intList"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div style="max-width:var(--w);margin:0 auto">
+        <p>
+        Heat &amp; Health NL &nbsp;·&nbsp; Decision-support prototype &nbsp;·&nbsp; 
+        Data: CBS, RIVM, GGD &nbsp;·&nbsp; 
+        Relative vulnerability scores, not exact health forecasts &nbsp;·&nbsp; 
+        <a href="dashboard.html">Open full dashboard →</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA DEFINITIONS
+// ═══════════════════════════════════════════════════════════
+
+const PROVINCES = [
+    {code:'GR',name:'Groningen',    city:'Groningen',  gemeenten:['Groningen','Westerkwartier','Het Hogeland','Eemsdelta','Midden-Groningen','Oldambt','Pekela','Stadskanaal','Veendam','Westerwolde']},
+    {code:'FR',name:'Friesland',    city:'Leeuwarden', gemeenten:['Leeuwarden','Súdwest-Fryslân','De Fryske Marren','Harlingen','Waadhoeke','Tytsjerksteradiel','Achtkarspelen','Noardeast-Fryslân','Opsterland','Smallingerland','Heerenveen','Ooststellingwerf','Weststellingwerf']},
+    {code:'DR',name:'Drenthe',      city:'Assen',      gemeenten:['Emmen','Hoogeveen','Assen','Coevorden','De Wolden','Meppel','Midden-Drenthe','Borger-Odoorn','Noordenveld','Westerveld','Tynaarlo','Aa en Hunze']},
+    {code:'OV',name:'Overijssel',   city:'Zwolle',     gemeenten:['Enschede','Almelo','Deventer','Zwolle','Hengelo','Oldenzaal','Rijssen-Holten','Hellendoorn','Wierden','Losser','Dinkelland','Steenwijkerland','Hardenberg','Kampen','Zwartewaterland','Dalfsen','Ommen','Staphorst','Tubbergen']},
+    {code:'GE',name:'Gelderland',   city:'Arnhem',     gemeenten:['Arnhem','Nijmegen','Apeldoorn','Ede','Doetinchem','Harderwijk','Zutphen','Wageningen','Tiel','Barneveld','Berg en Dal','Duiven','Westervoort','Renkum','Rheden','Overbetuwe','Oost Gelre','Aalten','Winterswijk','Montferland','Bronckhorst','Lochem','Berkelland','Brummen','Voorst','Zevenaar','Neder-Betuwe','Oude IJsselstreek','West Maas en Waal','Maasdriel','Zaltbommel','Culemborg','Buren','Lingewaard','Nijkerk','Wijchen','Heumen','Druten']},
+    {code:'UT',name:'Utrecht',      city:'Utrecht',    gemeenten:['Utrecht','Amersfoort','Veenendaal','Houten','Nieuwegein','IJsselstein','Woerden','Stichtse Vecht','De Bilt','Zeist','Utrechtse Heuvelrug','Lopik','Montfoort','Oudewater','Bunnik','Wijk bij Duurstede','Soest','Baarn','Eemnes','Bunschoten','Rhenen']},
+    {code:'NH',name:'Noord-Holland',city:'Amsterdam',  gemeenten:['Amsterdam','Haarlem','Alkmaar','Zaanstad','Haarlemmermeer','Hilversum','Den Helder','Hoorn','Velsen','Purmerend','Enkhuizen','Medemblik','Hollands Kroon','Texel','Bergen','Castricum','Dijk en Waard','Heiloo','Uitgeest','Bloemendaal','Heemstede','Zandvoort','Beverwijk','Uithoorn','Amstelveen','Aalsmeer','Diemen','Edam-Volendam','Waterland','Wormerland','Landsmeer','Oostzaan','Koggenland','Stede Broec']},
+    {code:'ZH',name:'Zuid-Holland', city:'Den Haag',   gemeenten:['Rotterdam','Den Haag','Leiden','Dordrecht','Zoetermeer','Delft','Westland','Alphen aan den Rijn','Lansingerland','Gouda','Pijnacker-Nootdorp','Nissewaard','Goeree-Overflakkee','Hoeksche Waard','Vlaardingen','Schiedam','Capelle aan den IJssel','Krimpen aan den IJssel','Ridderkerk','Barendrecht','Zwijndrecht','Papendrecht','Sliedrecht','Hardinxveld-Giessendam','Gorinchem','Molenlanden','Alblasserdam','Hendrik-Ido-Ambacht','Leidschendam-Voorburg','Rijswijk','Wassenaar','Katwijk','Teylingen','Kaag en Braassem','Nieuwkoop','Bodegraven-Reeuwijk','Krimpenerwaard','Maassluis','Midden-Delfland','Brielle']},
+    {code:'ZE',name:'Zeeland',      city:'Middelburg', gemeenten:['Middelburg','Goes','Terneuzen','Vlissingen','Hulst','Tholen','Borsele','Noord-Beveland','Kapelle','Reimerswaal','Schouwen-Duiveland','Sluis','Veere']},
+    {code:'NB',name:'Noord-Brabant',city:'Den Bosch',  gemeenten:['Eindhoven','Tilburg','Breda',"'s-Hertogenbosch",'Helmond','Roosendaal','Bergen op Zoom','Oss','Waalwijk','Meierijstad','Bernheze','Boekel','Boxtel','Cranendonck','Gemert-Bakel','Laarbeek','Sint-Michielsgestel','Asten','Bladel','Eersel','Geldrop-Mierlo','Heeze-Leende','Oirschot','Reusel-De Mierden','Son en Breugel','Valkenswaard','Veldhoven','Waalre','Altena','Drimmelen','Geertruidenberg','Loon op Zand','Oosterhout','Alphen-Chaam','Baarle-Nassau','Dongen','Goirle','Gilze en Rijen','Hilvarenbeek','Moerdijk','Steenbergen','Halderberge','Rucphen','Woensdrecht','Zundert','Deurne','Nuenen c.a.']},
+    {code:'LI',name:'Limburg',      city:'Maastricht', gemeenten:['Maastricht','Venlo','Sittard-Geleen','Heerlen','Roermond','Venray','Weert','Landgraaf','Brunssum','Kerkrade','Valkenburg aan de Geul','Bergen','Beesel','Echt-Susteren','Gennep','Horst aan de Maas','Leudal','Maasgouw','Peel en Maas','Roerdalen','Nederweert','Beekdaelen','Gulpen-Wittem','Beek','Eijsden-Margraten','Meerssen','Vaals','Simpelveld','Voerendaal','Stein']},
+    {code:'FL',name:'Flevoland',    city:'Lelystad',   gemeenten:['Almere','Lelystad','Dronten','Zeewolde','Urk','Noordoostpolder']},
+];
+
+const THEMES = [
+    {key:'theme_heat',          short:'Heat',       label:'Heat Exposure',                    color:'#c94a2a'},
+    {key:'theme_populations',   short:'Popul.',     label:'Vulnerable Populations',           color:'#7b2d8b'},
+    {key:'theme_socioeconomic', short:'Depriv.',    label:'Socioeconomic Deprivation',        color:'#b8860b'},
+    {key:'theme_mental_health', short:'Mental',     label:'Mental Health & Social Isolation', color:'#2d6a4f'},
+    {key:'theme_built_access',  short:'Built+',     label:'Built Environment & Access',       color:'#1e5f8a'},
+];
+
+const RAMPS = {
+    theme_heat:         ['#fff5f0','#fcc5a1','#fc8c59','#e83f1b','#7f0000'],
+    theme_populations:  ['#f7f0fb','#d4a8e8','#9e4dbb','#6a1b8a','#330044'],
+    theme_socioeconomic:['#fffde7','#ffe27a','#f0a500','#b36b00','#5c3200'],
+    theme_mental_health:['#f0faf4','#a8ddb5','#43a866','#1a6e3a','#083820'],
+    theme_built_env:    ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
+    theme_access:       ['#f0faf4','#b7e4c7','#52b788','#1b7a40','#081c15'],
+    theme_built_access: ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
+    composite:          ['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'],
+};
+
+const INTERVENTIONS = {
+    theme_heat:{label:'Heat Exposure',color:'#c94a2a',items:[
+        {type:'Infrastructure',name:'Urban greening corridors',desc:'Plant street trees and vegetated corridors along the hottest streets. Each mature tree reduces surrounding Physiological Equivalent Temperature by 2–4°C and provides shade for pedestrians.'},
+        {type:'Infrastructure',name:'Blue-green infrastructure',desc:'Introduce water channels, retention ponds, and misting stations in high-density zones. Open water surfaces cool the air through evaporation during heat events.'},
+        {type:'Housing',name:'Reflective and green roofing',desc:'Subsidise installation of green roofs and light-coloured reflective roofing for residential buildings. Green roofs can reduce rooftop temperatures by up to 30°C on hot days.'},
+        {type:'Policy',name:'Heat island priority zoning',desc:'Use PET data to designate heat priority zones. Require shade structures, cool paving, and a minimum green space ratio in all new developments within those zones.'},
+    ]},
+    theme_populations:{label:'Vulnerable Populations',color:'#7b2d8b',items:[
+        {type:'Services',name:'Proactive heat wave outreach',desc:'Train neighbourhood workers to conduct door-to-door welfare checks on elderly people living alone and families with young children during orange and red heat alerts from KNMI.'},
+        {type:'Services',name:'Community buddy program',desc:'Match isolated elderly residents with trained volunteer neighbours for regular contact. A simple check-in during heat waves can prevent heat-related illness and death.'},
+        {type:'Services',name:'Cool rest spaces in care facilities',desc:'Ensure all care homes, daycare centres, and community centres have at least one air-conditioned rest room available to residents and neighbourhood visitors during heat events.'},
+        {type:'Policy',name:'Heat emergency protocol for frail residents',desc:'Develop a tiered response protocol triggered by KNMI heat warnings, with automatic outreach to care providers and high-risk individuals identified via health records.'},
+    ]},
+    theme_socioeconomic:{label:'Socioeconomic Deprivation',color:'#b8860b',items:[
+        {type:'Financial',name:'Free cooling equipment distribution',desc:'Distribute fans and portable cooling devices to households below social minimum. Prioritise families with elderly members, infants, or chronically ill individuals registered with GGD.'},
+        {type:'Housing',name:'Targeted home insulation subsidies',desc:'Offer income-based grants for low-cost heat adaptation: internal blinds, door and window sealing, and secondary glazing for pre-2000 housing stock in deprived neighbourhoods.'},
+        {type:'Services',name:'Multilingual heat communication',desc:'Translate all heat-health alerts and guidance into the top five community languages. Use WhatsApp, community radio, and trusted local organisations to reach residents with limited digital access.'},
+        {type:'Policy',name:'Landlord minimum heat standards',desc:'Introduce a local ordinance requiring landlords to ensure rental properties meet minimum indoor thermal comfort standards, with enforcement through existing housing inspection routes.'},
+    ]},
+    theme_mental_health:{label:'Mental Health & Social Isolation',color:'#2d6a4f',items:[
+        {type:'Services',name:'Social prescribing: green spaces',desc:'Train GPs to issue prescriptions for regular visits to local parks and community gardens for patients experiencing stress, loneliness, or depression — particularly effective during hot periods.'},
+        {type:'Services',name:'Community health worker programme',desc:'Deploy community health workers with dual mental health and heat-health training into high-stress, high-loneliness neighbourhoods for year-round preventative outreach.'},
+        {type:'Infrastructure',name:'Shaded community garden network',desc:'Develop a network of accessible, shaded community gardens and social spaces. Green social infrastructure reduces stress biomarkers while providing outdoor cooling for residents.'},
+        {type:'Policy',name:'Integrated loneliness and heat risk mapping',desc:'Cross-reference loneliness prevalence data with heat exposure scores to identify the highest-priority neighbourhoods for compound mental-heat health interventions.'},
+    ]},
+    theme_built_env:{label:'Built Environment',color:'#1e5f8a',items:[
+        {type:'Infrastructure',name:'Shaded public routes and stops',desc:'Install shade structures over key pedestrian routes, cycle paths, and bus stops in neighbourhoods dominated by pre-2010 housing. Prioritise routes used by elderly and mobility-limited residents.'},
+        {type:'Housing',name:'Building heat retrofit programme',desc:'Target pre-2010 housing blocks for a phased insulation and passive ventilation retrofit. Include loft insulation, draft-proofing, and low-cost window shading as the minimum standard.'},
+        {type:'Policy',name:'Mandatory heat risk labelling for rentals',desc:'Require energy labels for all rental properties to include a heat risk rating based on building age, orientation, and insulation quality. Disclose to tenants at signing.'},
+        {type:'Infrastructure',name:'Pilot heat-resilient street redesign',desc:'Redesign one key street per neighbourhood as a demonstration project: remove excess dark paving, plant trees, install permeable surfaces, and add a water feature.'},
+    ]},
+    theme_access:{label:'Access & Green Space',color:'#2e7d4f',items:[
+        {type:'Services',name:'Mobile GP and health units',desc:'Deploy mobile health units to underserved neighbourhoods during heat events to provide GP consultations and early heat-illness screening close to where people live.'},
+        {type:'Infrastructure',name:'300m green corridor target',desc:'Ensure every resident is within 300m of accessible public green space. Close gaps in the green network through targeted planting on underused parcels, schoolyards, and parking areas.'},
+        {type:'Services',name:'Cool zone map and signage',desc:'Map and publicise all nearest accessible cooling spaces — libraries, community centres, large supermarkets. Install multilingual signage and maintain a live online map.'},
+        {type:'Infrastructure',name:'Climate-proof public transport stops',desc:'Retrofit bus stops and station platforms with shade structures and seating, particularly in low-car neighbourhoods where residents depend on public transport during extreme heat.'},
+    ]},
+    theme_built_access:{label:'Built Environment & Access',color:'#1e5f8a',items:[
+    {type:'Infrastructure',name:'Shaded public routes and stops',desc:'Install shade structures over key pedestrian routes, cycle paths, and bus stops in neighbourhoods with high exposure and limited cooling infrastructure.'},
+    {type:'Housing',name:'Building heat retrofit programme',desc:'Target older housing blocks for passive cooling, insulation, ventilation, and window shading to reduce indoor heat accumulation during prolonged heat events.'},
+    {type:'Infrastructure',name:'Accessible cooling and green spaces',desc:'Improve access to parks, shaded public spaces, libraries, community centres, and other cooling locations within walking distance of vulnerable residents.'},
+    {type:'Services',name:'Cool zone map and signage',desc:'Map and publicise nearby cooling spaces, including multilingual signage and online information for residents with limited access to private cooling.'},
+]},
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let geoData = null;
+let activeProv = null;
+let activeMuni = null;
+let activeTheme = THEMES[0];
+let currentProvSortTheme = 'composite'; 
+let currentMuniSortTheme = 'composite'; 
+let rMap = null, rLayer = null;
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+buildHeatGrid();
+renderProvinceGrid(); // Renders empty grid before data loads
+buildThemeTabs();
+document.getElementById('backBtn').addEventListener('click', backToMuniList);
+document.getElementById('provSort').addEventListener('change', e => {
+    currentProvSortTheme = e.target.value;
+    renderProvinceGrid();
+});
+document.getElementById('muniSort').addEventListener('change', e => {
+    currentMuniSortTheme = e.target.value;
+    if (activeProv) renderMuniList();
+});
+loadGeoData();
+
+// ═══════════════════════════════════════════════════════════
+// HEAT GRID ANIMATION
+// ═══════════════════════════════════════════════════════════
+function buildHeatGrid() {
+    const g = document.getElementById('heatGrid');
+    const cols = ['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'];
+    for (let i = 0; i < 144; i++) {
+        const t = Math.random();
+        const c = document.createElement('div');
+        c.className = 'heat-cell';
+        c.style.cssText = `background:${cols[Math.floor(t*cols.length)]};--d:${2+Math.random()*4}s;--dl:-${Math.random()*5}s;--mo:${.2+t*.5}`;
+        g.appendChild(c);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DATA LOAD & PROVINCE SCORING
+// ═══════════════════════════════════════════════════════════
+async function loadGeoData() {
+    try {
+        const r = await fetch('map_scenarios.geojson');
+        geoData = await r.json();
+
+        // Merge Built Environment and Access & Green Space into one conceptual dimension.
+        // This keeps the original GeoJSON fields intact while aligning the interface with the 5-dimension framework.
+        geoData.features.forEach(f => {
+            const p = f.properties;
+            const built = Number(p.theme_built_env);
+            const access = Number(p.theme_access);
+            const values = [built, access].filter(v => !isNaN(v));
+
+            p.theme_built_access = values.length
+                ? values.reduce((a, b) => a + b, 0) / values.length
+                : null;
+        });
+        
+        // Calculate true province averages across all matching neighborhoods
+        PROVINCES.forEach(p => {
+            const feats = geoData.features.filter(f => p.gemeenten.includes(f.properties.gemeentenaam));
+            const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+            p.avgRisk = avg(feats.map(f => f.properties.risk_2025_baseline));
+            p.themes = Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => f.properties[t.key]))]));
+        });
+
+        document.getElementById('dataStatus').textContent =
+            `${geoData.features.length.toLocaleString()} neighborhoods loaded — select a province to begin`;
+            
+        document.getElementById('provSort').style.display = 'block';
+        renderProvinceGrid();
+
+    } catch(e) {
+        document.getElementById('dataStatus').textContent =
+            'Could not load map_scenarios.geojson — make sure it is in the same folder.';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DYNAMIC PROVINCE GRID
+// ═══════════════════════════════════════════════════════════
+function renderProvinceGrid() {
+    const grid = document.getElementById('provGrid');
+    grid.innerHTML = '';
+    
+    let sortedProvs = [...PROVINCES];
+    
+    // Sort logic only runs after data is loaded
+    if (geoData) {
+        sortedProvs.sort((a,b) => {
+            const scoreA = currentProvSortTheme === 'composite' ? a.avgRisk : a.themes[currentProvSortTheme];
+            const scoreB = currentProvSortTheme === 'composite' ? b.avgRisk : b.themes[currentProvSortTheme];
+            return scoreB - scoreA; // Descending
+        });
+    }
+
+    sortedProvs.forEach((p, idx) => {
+        const b = document.createElement('button');
+        b.className = 'prov-btn';
+        b.dataset.code = p.code;
+        if (activeProv && activeProv.code === p.code) b.classList.add('active');
+        
+        let scoreHtml = '';
+        let rankText = p.code; 
+        
+        if (geoData && p.avgRisk !== undefined) {
+            const displayScore = currentProvSortTheme === 'composite' ? p.avgRisk : p.themes[currentProvSortTheme];
+            scoreHtml = `<span class="prov-score">${Math.round(displayScore)}</span>`;
+            rankText = `${idx + 1} · ${p.code}`; // Prepend rank
+        }
+
+        b.innerHTML = `<span class="pb-code">${rankText}</span><span class="pb-name">${p.name}</span><span class="pb-city">${p.city}</span>${scoreHtml}`;
+        b.addEventListener('click', () => selectProvince(p));
+        grid.appendChild(b);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PROVINCE → MUNICIPALITY LIST
+// ═══════════════════════════════════════════════════════════
+function selectProvince(prov) {
+    if (!geoData) { alert('Data not yet loaded. Please wait a moment.'); return; }
+    activeProv = prov;
+
+    renderProvinceGrid(); // Update active state visually
+    setStep(2);
+    renderMuniList();
+
+    showPanel('panelMuni');
+    document.getElementById('panelMuni').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function renderMuniList() {
+    if (!activeProv) return;
+    
+    const rankings = rankGemeenten(activeProv.gemeenten, currentMuniSortTheme);
+
+    document.getElementById('muniPanelTitle').textContent = activeProv.name;
+    document.getElementById('muniPanelMeta').textContent =
+        `${rankings.length} municipality${rankings.length !== 1 ? 'ies' : 'y'} with data`;
+
+    const list = document.getElementById('muniList');
+    list.innerHTML = '';
+    if (!rankings.length) {
+        list.innerHTML = `<p style="grid-column:span 2;font-family:var(--mono);font-size:.7rem;color:var(--light);padding:16px 0">No neighborhood data found for this province in the current dataset.</p>`;
+    }
+    
+    rankings.slice(0, 10).forEach((gm, i) => {
+        const worst = worstThemes(gm, 2);
+        const displayScore = currentMuniSortTheme === 'composite' ? gm.avgRisk : gm.themes[currentMuniSortTheme];
+        
+        const card = document.createElement('button');
+        card.className = 'muni-card';
+        card.innerHTML = `
+            <span class="mc-rank">${i+1}</span>
+            <span class="mc-name">${gm.name}</span>
+            <div class="mc-badges">
+                ${worst.map(t => `<span class="mc-badge" style="background:${t.color}">${t.short}</span>`).join('')}
+            </div>
+            <span class="mc-score">${Math.round(displayScore)}</span>`;
+        card.addEventListener('click', () => selectMuni(gm.name));
+        list.appendChild(card);
+    });
+}
+
+function rankGemeenten(gemeenten, sortTheme) {
+    return gemeenten.map(name => {
+        const feats = geoData.features.filter(f => f.properties.gemeentenaam === name);
+        if (!feats.length) return null;
+        const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+        
+        const gmData = {
+            name,
+            count: feats.length,
+            avgRisk: avg(feats.map(f => f.properties.risk_2025_baseline)),
+            themes: Object.fromEntries(THEMES.map(t => [t.key, avg(feats.map(f => f.properties[t.key]))]))
+        };
+        return gmData;
+    }).filter(Boolean).sort((a,b) => {
+        const scoreA = sortTheme === 'composite' ? a.avgRisk : a.themes[sortTheme];
+        const scoreB = sortTheme === 'composite' ? b.avgRisk : b.themes[sortTheme];
+        return scoreB - scoreA; 
+    });
+}
+
+function worstThemes(gm, n) {
+    return THEMES.map(t => ({...t, score: gm.themes[t.key]||0}))
+        .sort((a,b) => b.score-a.score).slice(0,n);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MUNICIPALITY → NEIGHBORHOOD RESULTS
+// ═══════════════════════════════════════════════════════════
+function selectMuni(name) {
+    if (!geoData) return;
+    activeMuni = name;
+    const feats = geoData.features.filter(f => f.properties.gemeentenaam === name);
+    if (!feats.length) { alert('No data for ' + name); return; }
+
+    setStep(3);
+    document.getElementById('rMuniName').textContent = name;
+    document.getElementById('rMuniMeta').textContent =
+        `${feats.length} neighborhoods · ${activeProv?.name||''} · 2025 baseline`;
+
+    showPanel('panelResults');
+    document.getElementById('panelResults').scrollIntoView({behavior:'smooth', block:'start'});
+
+    setTimeout(() => {
+        initMap(feats);
+        buildOverview(feats, name);
+        buildRankings(feats, activeTheme);
+        buildInterventions(feats);
+    }, 50);
+}
+
+function backToMuniList() {
+    setStep(2);
+    showPanel('panelMuni');
+    document.getElementById('panelMuni').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════════════
+function initMap(feats) {
+    if (rMap) { rMap.remove(); rMap = null; rLayer = null; }
+    rMap = L.map('r-map', {zoomControl:true});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        {attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(rMap);
+    redrawLayer(feats);
+    if (rLayer) rMap.fitBounds(rLayer.getBounds(), {padding:[20,20]});
+}
+
+function redrawLayer(feats) {
+    if (rLayer) rMap.removeLayer(rLayer);
+    rLayer = L.geoJson({type:'FeatureCollection',features:feats},{
+        style: f => ({
+            fillColor: rampColor(f.properties[activeTheme.key], activeTheme.key),
+            weight:.5, opacity:1, color:'#1a1410', fillOpacity:.85
+        }),
+        onEachFeature:(f,layer)=>{
+            const n = f.properties.buurtnaam||'Neighborhood';
+            const s = f.properties[activeTheme.key];
+            layer.bindPopup(`<b style="font-family:serif;font-size:14px">${n}</b><br><span style="font-family:monospace;font-size:11px">${activeTheme.label}: ${s!=null?Math.round(s):'—'}/100</span>`);
+            layer.on('mouseover',function(){this.setStyle({weight:2,fillOpacity:1})});
+            layer.on('mouseout', function(){this.setStyle({weight:.5,fillOpacity:.85})});
+        }
+    }).addTo(rMap);
+}
+
+// ═══════════════════════════════════════════════════════════
+// THEME TABS
+// ═══════════════════════════════════════════════════════════
+function buildThemeTabs() {
+    const tabs = document.getElementById('themeTabs');
+    THEMES.forEach((t,i) => {
+        const b = document.createElement('button');
+        b.className = 'theme-tab' + (i===0?' on':'');
+        b.dataset.key = t.key;
+        b.innerHTML = `<span class="t-dot" style="background:${t.color}"></span>${t.short}`;
+        b.addEventListener('click', () => {
+            activeTheme = t;
+            document.querySelectorAll('.theme-tab').forEach(x => x.classList.toggle('on', x.dataset.key===t.key));
+            if (activeMuni) {
+                const feats = geoData.features.filter(f => f.properties.gemeentenaam===activeMuni);
+                redrawLayer(feats);
+                buildRankings(feats, t);
+            }
+        });
+        tabs.appendChild(b);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// RANKINGS
+// ═══════════════════════════════════════════════════════════
+function buildRankings(feats, theme) {
+    const sorted = feats
+        .filter(f => f.properties[theme.key] != null)
+        .sort((a,b) => b.properties[theme.key] - a.properties[theme.key])
+        .slice(0, 10);
+
+    const list = document.getElementById('rankList');
+    list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Worst neighborhoods — ${theme.label}</div>`;
+    sorted.forEach((f,i) => {
+        const s = Math.round(f.properties[theme.key]);
+        const row = document.createElement('div');
+        row.className = 'rank-row';
+        row.innerHTML = `<span class="r-pos">${i+1}</span><span class="r-name">${f.properties.buurtnaam||'—'}</span><div class="r-bar"><div class="r-fill" style="width:${s}%;background:${theme.color}"></div></div><span class="r-val">${s}</span>`;
+        list.appendChild(row);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// OVERVIEW CARD
+// ═══════════════════════════════════════════════════════════
+function buildOverview(feats, name) {
+    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+    const comp = Math.round(avg(feats.map(f=>f.properties.risk_2025_baseline)));
+    const rows = THEMES.map(t => {
+        const s = Math.round(avg(feats.map(f=>f.properties[t.key])));
+        return `<div class="ov-row">
+            <span class="ov-label">${t.short}</span>
+            <div class="ov-track"><div class="ov-fill" style="width:${s}%;background:${t.color}"></div></div>
+            <span class="ov-val">${s}</span>
+        </div>`;
+    }).join('');
+    document.getElementById('overviewCard').innerHTML = `
+        <div class="ov-name">${name}</div>
+        <span class="ov-meta">${feats.length} neighborhoods · composite risk ${comp}/100</span>
+        <div class="ov-rows">${rows}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTERVENTIONS (based on 3 worst themes)
+// ═══════════════════════════════════════════════════════════
+function buildInterventions(feats) {
+    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
+    const worst3 = THEMES
+        .map(t => ({key:t.key, score:avg(feats.map(f=>f.properties[t.key]))}))
+        .sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.key);
+
+    const container = document.getElementById('intList');
+    container.innerHTML = '';
+    worst3.forEach(key => {
+        const cfg = INTERVENTIONS[key];
+        if (!cfg) return;
+        cfg.items.slice(0, 2).forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'int-card';
+            card.innerHTML = `
+                <div class="int-bar" style="background:${cfg.color}"></div>
+                <div class="int-body">
+                    <span class="int-theme">${cfg.label}</span>
+                    <div class="int-name">${item.name}</div>
+                    <div class="int-desc">${item.desc}</div>
+                    <span class="int-type">${item.type}</span>
+                </div>`;
+            container.appendChild(card);
+        });
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function setStep(n) {
+    [['si1',1],['si2',2],['si3',3]].forEach(([id,num]) => {
+        const el = document.getElementById(id);
+        el.classList.remove('active','done');
+        if (num < n) el.classList.add('done');
+        else if (num === n) el.classList.add('active');
+    });
+}
+
+function showPanel(id) {
+    ['panelMuni','panelResults'].forEach(pid => {
+        const el = document.getElementById(pid);
+        el.classList.toggle('on', pid === id);
+    });
+}
+
+function rampColor(score, key) {
+    if (score == null || isNaN(score)) return '#e8e2d9';
+    const ramp = RAMPS[key] || RAMPS.composite;
+    const idx = Math.min((score/100)*(ramp.length-1), ramp.length-1.001);
+    const lo = Math.floor(idx), hi = Math.ceil(idx);
+    if (lo===hi) return ramp[lo];
+    const p = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+    const [r1,g1,b1]=p(ramp[lo]),[r2,g2,b2]=p(ramp[hi]),t=idx-lo;
+    return '#'+[r1+(r2-r1)*t,g1+(g2-g1)*t,b1+(b2-b1)*t].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+}
+</script>
+</body>
+</html>
