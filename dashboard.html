@@ -232,7 +232,7 @@
 
     <!-- THEMATIC VARIABLE LAYERS -->
     <div class="control-group">
-        <span class="section-label">Variable Themes</span>
+        <span class="section-label">Vulnerability Dimensions</span>
         <div class="theme-grid">
 
             <button class="theme-btn" style="--theme-color:var(--c-heat)"
@@ -249,7 +249,7 @@
 
             <button class="theme-btn" style="--theme-color:var(--c-socio)"
                     data-layer="theme_socioeconomic" data-type="theme" data-theme="socioeconomic">
-                <span class="th-name">Socioeconomic</span>
+                <span class="th-name">Socioeconomic Deprivation</span>
                 <span class="th-vars">Income · Education · Social min · Rental</span>
             </button>
 
@@ -259,16 +259,10 @@
                 <span class="th-vars">Stress · Loneliness · Anxiety</span>
             </button>
 
-            <button class="theme-btn" style="--theme-color:var(--c-built)"
-                    data-layer="theme_built_env" data-type="theme" data-theme="built_env">
-                <span class="th-name">Built Environment</span>
-                <span class="th-vars">Old bldgs · Gas use · No indoor cooling</span>
-            </button>
-
-            <button class="theme-btn" style="--theme-color:var(--c-access)"
-                    data-layer="theme_access" data-type="theme" data-theme="access">
-                <span class="th-name">Access & Green</span>
-                <span class="th-vars">GP dist · Hospital · Parks · Cooling</span>
+            <button class="theme-btn span2" style="--theme-color:var(--c-built)"
+                    data-layer="theme_built_access" data-type="theme" data-theme="built_access">
+                <span class="th-name">Built Environment & Access</span>
+                <span class="th-vars">Housing · Cooling spaces · Green access · Health services</span>
             </button>
 
         </div>
@@ -276,7 +270,7 @@
 
     <!-- MODEL CARD -->
     <div class="model-card">
-        <h3>Composite 6-Factor Model</h3>
+        <h3>Composite Vulnerability Model</h3>
         <div class="formula">
             Vulnerability ≈ f(<br>
             &nbsp;&nbsp;<span style="color:#f4a261">PET temp</span>,
@@ -296,23 +290,21 @@
 <script>
 // ─── THEME DEFINITIONS ────────────────────────────────────────────────────────
 const THEME_DEFS = {
-    composite:    { label: 'Composite Risk',         color: '#1a1410' },
-    heat:         { label: 'Heat Exposure',           color: '#c94a2a' },
-    populations:  { label: 'Vulnerable Populations',  color: '#7b2d8b' },
-    socioeconomic:{ label: 'Socioeconomic',           color: '#b8860b' },
-    mental_health:{ label: 'Mental Health',           color: '#2d6a4f' },
-    built_env:    { label: 'Built Environment',       color: '#1e5f8a' },
-    access:       { label: 'Access & Green Space',    color: '#2e7d4f' },
+    composite:     { label: 'Composite Risk',                    color: '#1a1410' },
+    heat:          { label: 'Heat Exposure',                     color: '#c94a2a' },
+    populations:   { label: 'Vulnerable Populations',            color: '#7b2d8b' },
+    socioeconomic: { label: 'Socioeconomic Deprivation',         color: '#b8860b' },
+    mental_health: { label: 'Mental Health & Social Isolation',  color: '#2d6a4f' },
+    built_access:  { label: 'Built Environment & Access',        color: '#1e5f8a' },
 };
 
 // All popup themes in display order
 const POPUP_THEMES = [
-    { key:'theme_heat',         label:'Heat',     theme:'heat' },
-    { key:'theme_populations',  label:'Popul.',   theme:'populations' },
-    { key:'theme_socioeconomic',label:'Socio.',   theme:'socioeconomic' },
-    { key:'theme_mental_health',label:'Mental',   theme:'mental_health' },
-    { key:'theme_built_env',    label:'Built',    theme:'built_env' },
-    { key:'theme_access',       label:'Access',   theme:'access' },
+    { key:'theme_heat',          label:'Heat',     theme:'heat' },
+    { key:'theme_populations',   label:'Popul.',   theme:'populations' },
+    { key:'theme_socioeconomic', label:'Depriv.',  theme:'socioeconomic' },
+    { key:'theme_mental_health', label:'Mental',   theme:'mental_health' },
+    { key:'theme_built_access',  label:'Built+',   theme:'built_access' },
 ];
 
 // ─── COLOR RAMPS (index 0 = safe/low, index 4 = critical/high) ───────────────
@@ -322,8 +314,7 @@ const RAMPS = {
     populations:  ['#f7f0fb','#d4a8e8','#9e4dbb','#6a1b8a','#330044'],
     socioeconomic:['#fffde7','#ffe27a','#f0a500','#b36b00','#5c3200'],
     mental_health:['#f0faf4','#a8ddb5','#43a866','#1a6e3a','#083820'],
-    built_env:    ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
-    access:       ['#f0faf4','#b7e4c7','#52b788','#1b7a40','#081c15'],
+    built_access: ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
 };
 
 function rampColor(score, themeName) {
@@ -411,10 +402,21 @@ var geojsonLayer, geojsonData;
 fetch('map_scenarios.geojson')
     .then(r => r.json())
     .then(data => {
+        data.features.forEach(f => {
+            const p = f.properties;
+            const built = Number(p.theme_built_env);
+            const access = Number(p.theme_access);
+            const values = [built, access].filter(v => !isNaN(v));
+
+            p.theme_built_access = values.length
+                ? values.reduce((a, b) => a + b, 0) / values.length
+                : null;
+        });
+
         geojsonData = data;
         renderLayer();
         document.getElementById('debug-info').innerHTML =
-            `${data.features.length.toLocaleString()} neighborhoods · 10 layers`;
+            `${data.features.length.toLocaleString()} neighborhoods · 9 layers`;
     })
     .catch(() => {
         document.getElementById('debug-info').innerHTML = 'Data load error';
