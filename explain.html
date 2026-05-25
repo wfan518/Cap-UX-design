@@ -222,6 +222,136 @@
         .steps-list li::before { content: counter(step, decimal-leading-zero); font-family: var(--mono); font-size: 0.75rem; color: var(--accent); flex-shrink: 0; padding-top: 2px; min-width: 28px; }
         .steps-list li strong { color: var(--ink); }
         .steps-list code { font-family: var(--mono); font-size: 0.85em; background: var(--warm-mid); padding: 1px 5px; border-radius: 2px; }
+        
+        /* ── DUMMY SHOWCASES ── */
+        .showcase-note {
+            background: var(--green-pale);
+            border: 1px solid rgba(45,106,79,0.25);
+            border-left: 4px solid var(--green);
+            padding: 22px 26px;
+            border-radius: 4px;
+            margin: 24px 0 28px;
+        }
+
+        .showcase-note p {
+            margin: 0;
+            font-size: 0.96rem;
+            color: var(--text-mid);
+        }
+
+        .showcase-grid {
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .showcase-top {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--paper);
+        }
+
+        .case-label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.66rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .showcase-card h3 {
+        margin: 0 0 8px;
+        font-family: var(--serif);
+        font-size: 1.45rem;
+        color: var(--ink);
+        text-transform: none;
+        letter-spacing: 0;
+        }
+
+        .case-summary {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-mid);
+        }
+
+        .showcase-flow {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border-top: 1px solid var(--border);
+        }
+
+        .flow-block {
+            padding: 20px 22px;
+            border-right: 1px solid var(--border);
+        }
+
+        .flow-block:last-child {
+            border-right: none;
+        }
+
+        .flow-label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .dimension-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .dimension-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 4px 7px;
+            border-radius: 2px;
+            color: white;
+        }
+
+        .flow-block p {
+            margin: 0;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: var(--text-mid);
+        }
+
+        .flow-block ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .flow-block li {
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            line-height: 1.55;
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 760px) {
+            .showcase-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-block {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .flow-block:last-child {
+                border-bottom: none;
+            }
+        }
 
         /* ── CAVEATS ── */
         .caveat-item {
@@ -285,6 +415,13 @@
 </nav>
 
 <div class="container">
+
+<div class="showcase-note" style="margin-top: 40px;">
+    <p>
+        <strong>Methodology status:</strong> This page currently explains the prototype logic and interface rationale. 
+        The final data processing and modelling workflow will be updated once the dataset and analysis pipeline are confirmed.
+    </p>
+</div>
 
     <!-- ── 01 BIG PICTURE ── -->
     <section id="bigpicture" class="section">
@@ -365,10 +502,13 @@
         <section id="themes" class="section">
             <div class="section-header">
                 <span class="section-num">03</span>
-                <h2>Understanding the 6 Themes</h2>
+                <h2>Understanding the 5 Vulnerability Dimensions</h2>
             </div>
 
-            <p>Because "overall risk" isn't actionable enough for city planners, vulnerability is broken into six distinct themes. These do <em>not</em> use the regression model—instead they use <strong>Percentile Ranking</strong> across all 11,554 neighborhoods.</p>
+            <p>
+                Because an overall risk score is not actionable enough for municipal planning, vulnerability is broken into five dimensions. 
+                These dimensions help users understand whether risk is mainly driven by heat exposure, population sensitivity, socioeconomic deprivation, mental health and social isolation, or the built environment and access to support.
+            </p>
 
             <div class="math-box">
                 <h4>What does a score of 82 actually mean?</h4>
@@ -432,83 +572,210 @@
 
                 <div class="scenario-card" style="border-top: 4px solid var(--c-built)">
                     <div class="scenario-year" style="color: var(--c-built);">Theme 05</div>
-                    <div class="theme-icon" style="background: rgba(30,95,138,0.1); color: var(--c-built);">🏗️</div>
+                    <div class="theme-icon" style="background: rgba(30,95,138,0.1); color: var(--c-built);">🏘️</div>
                     <div class="scenario-title">Built Environment</div>
-                    <div class="scenario-desc"><strong>What it measures:</strong> Thermal traps. Buildings constructed prior to 2010 often have poor thermal mass. We use high winter gas usage as a proxy—homes that leak heat in winter will rapidly trap solar gain in summer.</div>
-                </div>
-
-                <div class="scenario-card" style="border-top: 4px solid var(--c-access)">
-                    <div class="scenario-year" style="color: var(--c-access);">Theme 06</div>
-                    <div class="theme-icon" style="background: rgba(46,125,79,0.1); color: var(--c-access);">🌳</div>
-                    <div class="scenario-title">Access & Green Space</div>
-                    <div class="scenario-desc"><strong>What it measures:</strong> Proximity to emergency relief. Distance to GPs dictates the speed of heatstroke treatment, while distance to parks highlights "concrete jungles" that suffer from the Urban Heat Island effect.</div>
+                    <div class="scenario-desc">
+                        <strong>What it measures:</strong> The physical and service environment that shapes residents’ ability to reduce or respond to heat-health risk. 
+                        This includes housing quality, building density, green-space access, cooling spaces, and proximity to health and public services.
+                    </div>
                 </div>
             </div>
         </section>
 
-     <!-- ── 04 TOUR JOURNEY ── -->
-<section id="journey" class="section">
-    <div class="section-header">
-        <span class="section-num">04</span>
-        <h2>Using the prototype</h2>
-    </div>
+    <!-- ── 04 DUMMY SHOWCASES ── -->
+        <section id="showcases" class="section">
+            <div class="section-header">
+                <span class="section-num">04</span>
+                <h2>Dummy showcases: from scores to policy interpretation</h2>
+            </div>
 
-    <p>
-        The prototype helps municipal users move from neighbourhood-level heat-health data
-        to policy interpretation and possible preventive action.
-    </p>
+            <p>
+                The intervention suggestions in this prototype are not final policy prescriptions. 
+                They are illustrative decision-support outputs that show how high-scoring vulnerability dimensions can be translated into policy-relevant questions and possible local actions.
+            </p>
 
-    <ol class="steps-list">
-        <li>
-            <strong>Locate risk:</strong>
-            Identify neighbourhoods with high relative heat-health vulnerability.
-        </li>
-        <li>
-            <strong>Diagnose drivers:</strong>
-            See which social, health, environmental, and built-environment factors contribute to vulnerability.
-        </li>
-        <li>
-            <strong>Compare scenarios:</strong>
-            Use future scenario views to understand why preventive action may become more urgent over time.
-        </li>
-        <li>
-            <strong>Consider interventions:</strong>
-            Connect vulnerability patterns to possible municipal actions, such as cooling spaces, greening, outreach, and housing adaptation.
-        </li>
-    </ol>
-</section>
+            <div class="showcase-note">
+                <p>
+                    Each dummy showcase follows the same logic: identify the dominant vulnerability dimensions, interpret what the combination may mean for a municipality, and suggest possible intervention directions for discussion with local actors.
+                </p>
+            </div>
 
-    <!-- ── 05 CAVEATS ── -->
-    <section id="limitations" class="section">
-        <div class="section-header">
-            <span class="section-num">05</span>
-            <h2>Important Caveats</h2>
-        </div>
+            <div class="showcase-grid">
 
-        <div>
-            <div class="caveat-item">
-                <div class="caveat-num">01</div>
-                <div class="caveat-body">
-                    <strong>Neighbourhood averages hide internal variation.</strong>
-                    Within each boundary, pockets of extreme vulnerability exist. Block-by-block risk can be far higher than the neighbourhood score suggests.
+                <article class="showcase-card">
+                    <div class="showcase-top">
+                        <span class="case-label">Dummy showcase 01</span>
+                        <h3>Dense urban heat with limited cooling infrastructure</h3>
+                        <p class="case-summary">
+                            A municipality identifies neighbourhoods where high heat exposure overlaps with older housing, limited green access, and few accessible cooling spaces.
+                        </p>
+                    </div>
+
+                    <div class="showcase-flow">
+                        <div class="flow-block">
+                            <span class="flow-label">Dominant dimensions</span>
+                            <div class="dimension-tags">
+                                <span class="dimension-tag" style="background: var(--c-heat);">Heat Exposure</span>
+                                <span class="dimension-tag" style="background: var(--c-built);">Built Environment &amp; Access</span>
+                            </div>
+                        </div>
+
+                        <div class="flow-block">
+                            <span class="flow-label">Policy interpretation</span>
+                            <p>
+                                Outdoor heat stress is reinforced by physical conditions that make it harder for residents to cool down indoors or reach shaded public spaces.
+                            </p>
+                        </div>
+
+                        <div class="flow-block">
+                            <span class="flow-label">Possible directions</span>
+                            <ul>
+                                <li>Prioritise shaded walking routes and public transport stops.</li>
+                                <li>Map libraries, community centres, and other cooling spaces.</li>
+                                <li>Target older housing blocks for passive cooling measures.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="showcase-card">
+                    <div class="showcase-top">
+                        <span class="case-label">Dummy showcase 02</span>
+                        <h3>Elderly residents with weak social support</h3>
+                        <p class="case-summary">
+                            A local GGD advisor sees that physiological vulnerability is concentrated in neighbourhoods where loneliness or single-person households are also high.
+                        </p>
+                    </div>
+
+                    <div class="showcase-flow">
+                        <div class="flow-block">
+                            <span class="flow-label">Dominant dimensions</span>
+                            <div class="dimension-tags">
+                                <span class="dimension-tag" style="background: var(--c-pop);">Vulnerable Populations</span>
+                                <span class="dimension-tag" style="background: var(--c-mental);">Mental Health &amp; Social Isolation</span>
+                            </div>
+                        </div>
+
+                        <div class="flow-block">
+                            <span class="flow-label">Policy interpretation</span>
+                            <p>
+                                Heat risk is not only biological. It is also shaped by whether vulnerable residents have someone nearby who can check in, communicate warnings, or help them reach support.
+                            </p>
+                        </div>
+
+                        <div class="flow-block">
+                            <span class="flow-label">Possible directions</span>
+                            <ul>
+                                <li>Set up proactive heatwave outreach for elderly residents.</li>
+                                <li>Use community buddy systems during KNMI heat warnings.</li>
+                                <li>Coordinate GGD, GP, and neighbourhood worker responses.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="showcase-card">
+                    <div class="showcase-top">
+                        <span class="case-label">Dummy showcase 03</span>
+                        <h3>Socioeconomic deprivation and low adaptive capacity</h3>
+                        <p class="case-summary">
+                            A municipality finds neighbourhoods where low income, rental housing, and limited access to cooling options overlap.
+                        </p>
+                    </div>
+
+                    <div class="showcase-flow">
+                        <div class="flow-block">
+                            <span class="flow-label">Dominant dimensions</span>
+                            <div class="dimension-tags">
+                                <span class="dimension-tag" style="background: var(--c-socio);">Socioeconomic Deprivation</span>
+                                <span class="dimension-tag" style="background: var(--c-built);">Built Environment &amp; Access</span>
+                            </div>
+                        </div>
+
+                        <div class="flow-block">
+                            <span class="flow-label">Policy interpretation</span>
+                            <p>
+                                Residents may face heat-health risk not because they lack awareness, but because they have fewer financial, legal, or infrastructural options to adapt.
+                            </p>
+                        </div>
+
+                        <div class="flow-block">
+                            <span class="flow-label">Possible directions</span>
+                            <ul>
+                                <li>Provide multilingual heat-health communication through trusted local channels.</li>
+                                <li>Prioritise low-cost cooling and shading support.</li>
+                                <li>Coordinate housing adaptation with landlords and municipal services.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+    <!-- ── 05 TOUR JOURNEY ── -->
+        <section id="journey" class="section">
+            <div class="section-header">
+                <span class="section-num">04</span>
+                <h2>Using the prototype</h2>
+            </div>
+
+            <p>
+                The prototype helps municipal users move from neighbourhood-level heat-health data
+                to policy interpretation and possible preventive action.
+            </p>
+
+            <ol class="steps-list">
+                <li>
+                    <strong>Locate risk:</strong>
+                    Identify neighbourhoods with high relative heat-health vulnerability.
+                </li>
+                <li>
+                    <strong>Diagnose drivers:</strong>
+                    See which social, health, environmental, and built-environment factors contribute to vulnerability.
+                </li>
+                <li>
+                    <strong>Compare scenarios:</strong>
+                    Use future scenario views to understand why preventive action may become more urgent over time.
+                </li>
+                <li>
+                    <strong>Consider interventions:</strong>
+                    Connect vulnerability patterns to possible municipal actions, such as cooling spaces, greening, outreach, and housing adaptation.
+                </li>
+            </ol>
+        </section>
+
+    <!-- ── 06 CAVEATS ── -->
+        <section id="limitations" class="section">
+            <div class="section-header">
+                <span class="section-num">05</span>
+                <h2>Important Caveats</h2>
+            </div>
+
+            <div>
+                <div class="caveat-item">
+                    <div class="caveat-num">01</div>
+                    <div class="caveat-body">
+                        <strong>Neighbourhood averages hide internal variation.</strong>
+                        Within each boundary, pockets of extreme vulnerability exist. Block-by-block risk can be far higher than the neighbourhood score suggests.
+                    </div>
+                </div>
+                <div class="caveat-item">
+                    <div class="caveat-num">02</div>
+                    <div class="caveat-body">
+                        <strong>We assume no behavioural adaptation.</strong>
+                        In reality, residents will buy air conditioning, relocate, or build mutual support networks. Our long-term projections are deliberately conservative.
+                    </div>
+                </div>
+                <div class="caveat-item">
+                    <div class="caveat-num">03</div>
+                    <div class="caveat-body">
+                        <strong>Health data gaps exist.</strong>
+                        11,554 of 14,668 neighbourhoods have complete health data. Any neighborhood lacking sufficient CBS or GGD polling data is excluded from the ranking math to preserve statistical integrity.
+                    </div>
                 </div>
             </div>
-            <div class="caveat-item">
-                <div class="caveat-num">02</div>
-                <div class="caveat-body">
-                    <strong>We assume no behavioural adaptation.</strong>
-                    In reality, residents will buy air conditioning, relocate, or build mutual support networks. Our long-term projections are deliberately conservative.
-                </div>
-            </div>
-            <div class="caveat-item">
-                <div class="caveat-num">03</div>
-                <div class="caveat-body">
-                    <strong>Health data gaps exist.</strong>
-                    11,554 of 14,668 neighbourhoods have complete health data. Any neighborhood lacking sufficient CBS or GGD polling data is excluded from the ranking math to preserve statistical integrity.
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
 </div>
 
@@ -521,7 +788,7 @@
 
 <script>
     // Active state on sticky nav based on scroll position
-    const sections = ['bigpicture', 'model', 'themes', 'journey', 'limitations'];;
+    const sections = ['bigpicture', 'model', 'themes', 'showcases', 'journey', 'limitations'];
     const navLinks = document.querySelectorAll('.sticky-nav a[data-section]');
 
     const observer = new IntersectionObserver((entries) => {
