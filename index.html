@@ -95,6 +95,69 @@
     /* ── EXPLORER ── */
     #explorer{padding:88px 32px}
 
+    /* Compact Guide*/
+    .tool-guide {
+    margin: 26px 0 6px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.45);
+    border-radius: 2px;
+    }
+
+    .guide-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 12px;
+    }
+
+    .guide-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    }
+
+    .guide-step {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    }
+
+    .guide-step span {
+    display: inline-flex;
+    width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    flex-shrink: 0;
+    }
+
+    .guide-step p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--mid);
+    line-height: 1.35;
+    }
+
+    @media(max-width:800px) {
+    .guide-steps {
+        grid-template-columns: 1fr 1fr;
+    }
+    }
+
+    @media(max-width:520px) {
+    .guide-steps {
+        grid-template-columns: 1fr;
+    }
+    }
+
     /* Controls (dropdowns) */
     select{
         font-family:var(--mono);font-size:.7rem;letter-spacing:.04em;
@@ -365,20 +428,6 @@
     </div>
 </section>
 
-<!-- ═══════════ COMPACT GUIDE ═══════════ -->
-
-<div class="tool-guide">
-    <div class="guide-copy">
-        <span class="guide-label">Quick guide</span>
-        <strong>Start with a region, then inspect local vulnerability.</strong>
-        <p>
-            Select a province to rank municipalities. Open a municipality to compare neighbourhoods, 
-            identify dominant vulnerability dimensions, and review possible intervention directions.
-        </p>
-    </div>
-    <a href="explain.html#showcase" class="guide-link">See example use case →</a>
-</div>
-
 <!-- ═══════════ EXPLORER ═══════════ -->
 <section id="explorer">
     <div class="sec-inner">
@@ -388,6 +437,29 @@
             Choose a province and municipality to view neighbourhood-level vulnerability rankings, 
             dominant risk drivers, and possible municipal interventions.
         </p>
+
+        <!-- Compact Guide -->
+        <div class="tool-guide">
+            <div class="guide-label">Quick guide</div>
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <span>1</span>
+                    <p>Select a province</p>
+                </div>
+                <div class="guide-step">
+                    <span>2</span>
+                    <p>Review municipality ranking</p>
+                </div>
+                <div class="guide-step">
+                    <span>3</span>
+                    <p>Diagnose vulnerability drivers</p>
+                </div>
+                <div class="guide-step">
+                    <span>4</span>
+                    <p>Consider intervention directions</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Step indicator and Province Sort -->
         <div class="exp-header-controls">
