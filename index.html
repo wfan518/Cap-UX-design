@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Climate & Health — Heat Vulnerability in the Netherlands</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -13,8 +13,9 @@
         --ink:#1a1410; --paper:#faf8f5; --warm:#e8e2d9;
         --accent:#c94a2a; --accent-pale:#f5e8e3; --green:#2d6a4f;
         --mid:#4a3f35; --light:#7a6e64; --border:#d4ccc2;
-        --serif:'DM Serif Display',Georgia,serif;
-        --sans:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+        --serif:'Source Serif 4', Georgia, serif;
+        --sans:'Inter', Arial, sans-serif;
+        --mono:'IBM Plex Mono', monospace;
         --w:1200px;
         --c-heat:#c94a2a; --c-pop:#7b2d8b; --c-socio:#b8860b;
         --c-mental:#2d6a4f; --c-built:#1e5f8a; --c-access:#2e7d4f;
@@ -49,7 +50,13 @@
     }
     .hero-left{flex:1;max-width:580px}
     .hero-tag{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;display:block}
-    .hero-left h1{font-family:var(--serif);font-size:clamp(2.6rem,4.5vw,4rem);line-height:1.08;margin-bottom:24px}
+    .hero-left h1{
+    font-family:var(--serif);
+    font-size:clamp(2.6rem,4.5vw,4rem);
+    line-height:1.08;
+    margin-bottom:24px;
+    font-weight:700;
+    }
     .hero-left h1 em{font-style:italic;color:var(--accent)}
     .hero-left p{font-size:1.05rem;color:var(--mid);line-height:1.72;margin-bottom:36px;max-width:500px}
     .hero-stats{
@@ -76,7 +83,13 @@
     #problem{background:var(--ink);color:var(--paper);padding:88px 32px}
     .sec-inner{max-width:var(--w);margin:0 auto}
     .sec-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,248,245,.4);margin-bottom:12px;display:block}
-    .sec-h{font-family:var(--serif);font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.15;margin-bottom:14px}
+    .sec-h{
+    font-family:var(--serif);
+    font-size:clamp(1.8rem,3vw,2.6rem);
+    line-height:1.15;
+    margin-bottom:14px;
+    font-weight:600;
+    }
     .sec-sub{font-size:1rem;color:rgba(250,248,245,.6);max-width:580px;line-height:1.65;margin-bottom:52px}
     .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
     .pillar{

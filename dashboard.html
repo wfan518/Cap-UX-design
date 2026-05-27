@@ -6,7 +6,7 @@
     <title>Dashboard — Heat Vulnerability Tool</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -22,9 +22,9 @@
             --text-mid: #4a3f35;
             --text-light: #7a6e64;
             --border: #d4ccc2;
-            --serif: 'DM Serif Display', Georgia, serif;
-            --sans: 'DM Sans', sans-serif;
-            --mono: 'DM Mono', monospace;
+            --serif: 'Source Serif 4', Georgia, serif;
+            --sans: 'Inter', Arial, sans-serif;
+            --mono: 'IBM Plex Mono', monospace;
 
             --c-heat:    #c94a2a;
             --c-pop:     #7b2d8b;
@@ -74,9 +74,13 @@
         .nav-link:hover { background: var(--accent); }
 
         h1 { 
-            font-family: var(--serif); font-size: 2rem; 
-            line-height: 1.1; margin: 0 0 8px; 
+            font-family: var(--serif);
+            font-size: 2rem; 
+            line-height: 1.1;
+            margin: 0 0 8px;
+            font-weight: 700;
         }
+        
         p.subtitle { 
             font-size: 0.88rem; color: var(--text-mid); 
             line-height: 1.55; margin: 0 0 2px;
