@@ -40,11 +40,49 @@
         max-width:var(--w);margin:0 auto;padding:0 32px;width:100%;
         display:flex;align-items:center;justify-content:space-between;
     }
-    .nav-logo{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase}
+    .nav-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--serif);
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        text-transform: none;
+        color: var(--ink);
+    }
+    .logo-mark {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--accent);
+        display: inline-block;
+    }
     .nav-links{display:flex;gap:20px;align-items:center}
-    .nav-lk{font-family: var(--sans);font-size: 0.82rem;font-weight: 600;letter-spacing: 0;text-transform: none;color: var(--light);text-decoration: none;transition: .2s;}
+     .nav-lk {
+            font-family: var(--sans);
+            font-size: 0.86rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            color: var(--light);
+            text-decoration: none;
+            transition: .2s;
+        }
     .nav-lk:hover{color:var(--ink)}
-    .nav-btn{font-family: var(--sans);font-size: 0.82rem;font-weight: 600;letter-spacing: 0;text-transform: none;background: var(--ink);color: var(--paper);text-decoration: none;padding: 8px 16px;border-radius: 4px;transition: .2s;}
+    .nav-btn {
+            font-family: var(--sans);
+            font-size: 0.86rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            background: var(--ink);
+            color: var(--paper);
+            text-decoration: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            transition: .2s;
+        }
     .nav-btn:hover{background:var(--accent)}
 
     /* ── HERO ── */
@@ -382,7 +420,7 @@
 <!-- NAV -->
 <nav>
     <div class="nav-inner">
-        <span class="nav-logo">Heat &amp; Health NL</span>
+        <span class="nav-logo"><span class="logo-mark"></span>Heat &amp; Health NL</span>
         <div class="nav-links">
             <a href="explain.html" class="nav-lk">Methodology</a>
             <a href="#explorer" class="nav-lk">Explore</a>
