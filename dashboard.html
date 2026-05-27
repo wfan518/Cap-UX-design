@@ -26,6 +26,11 @@
             --sans: 'Inter', Arial, sans-serif;
             --mono: 'IBM Plex Mono', monospace;
 
+            --label-font: var(--sans);
+            --label-size: 0.78rem;
+            --label-weight: 600;
+            --label-spacing: 0.01em;
+
             --c-heat:    #c94a2a;
             --c-pop:     #7b2d8b;
             --c-socio:   #b8860b;
@@ -64,12 +69,19 @@
 
         .nav-link {
             flex: 1;
-            font-family: var(--mono); font-size: 0.62rem;
-            letter-spacing: 0.08em; text-transform: uppercase;
-            color: var(--paper); background: var(--ink);
-            text-decoration: none; padding: 10px 4px;
-            text-align: center; border-radius: 2px;
-            transition: 0.2s; display: block;
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+            color: var(--paper);
+            background: var(--ink);
+            text-decoration: none;
+            padding: 10px 4px;
+            text-align: center;
+            border-radius: 4px;
+            transition: 0.2s;
+            display: block;
         }
         .nav-link:hover { background: var(--accent); }
 
@@ -91,21 +103,34 @@
             border-top: 1px solid var(--border); 
         }
         .section-label {
-            font-family: var(--mono); font-size: 0.62rem;
-            letter-spacing: 0.14em; text-transform: uppercase;
-            display: block; margin-bottom: 9px; color: var(--text-light); 
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            text-transform: none;
+            display: block;
+            margin-bottom: 9px;
+            color: var(--text-light);
         }
         
         /* ── SCENARIO BUTTONS ── */
         .scenario-btn { 
-            display: block; width: 100%; 
-            padding: 9px 12px; margin-bottom: 5px; 
+            display: block;
+            width: 100%; 
+            padding: 10px 12px;
+            margin-bottom: 6px; 
             background: transparent; 
-            border: 1px solid var(--border); border-radius: 2px; 
-            cursor: pointer; text-align: left; 
-            font-family: var(--mono); font-size: 0.7rem; 
-            color: var(--text-mid); transition: 0.15s; 
-            text-transform: uppercase; letter-spacing: 0.05em;
+            border: 1px solid var(--border);
+            border-radius: 4px; 
+            cursor: pointer;
+            text-align: left; 
+            font-family: var(--sans);
+            font-size: 0.82rem; 
+            font-weight: 600;
+            color: var(--text-mid);
+            transition: 0.15s; 
+            text-transform: none;
+            letter-spacing: 0;
         }
         .scenario-btn:hover { background: var(--accent-pale); border-color: var(--accent); color: var(--accent-dark); }
         .scenario-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -131,9 +156,14 @@
             background: var(--theme-color, var(--border));
         }
         .theme-btn .th-name {
-            font-family: var(--mono); font-size: 0.63rem;
-            text-transform: uppercase; letter-spacing: 0.06em;
-            color: var(--ink); line-height: 1.3; margin-bottom: 3px;
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--ink);
+            line-height: 1.25;
+            margin-bottom: 4px;
         }
         .theme-btn .th-vars {
             font-family: var(--sans); font-size: 0.67rem;

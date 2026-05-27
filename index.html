@@ -19,6 +19,11 @@
         --w:1200px;
         --c-heat:#c94a2a; --c-pop:#7b2d8b; --c-socio:#b8860b;
         --c-mental:#2d6a4f; --c-built:#1e5f8a; --c-access:#2e7d4f;
+
+        --label-font: var(--sans);
+        --label-size: 0.78rem;
+        --label-weight: 600;
+        --label-spacing: 0.01em;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -37,9 +42,9 @@
     }
     .nav-logo{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase}
     .nav-links{display:flex;gap:20px;align-items:center}
-    .nav-lk{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);text-decoration:none;transition:.2s}
+    .nav-lk{font-family: var(--sans);font-size: 0.82rem;font-weight: 600;letter-spacing: 0;text-transform: none;color: var(--light);text-decoration: none;transition: .2s;}
     .nav-lk:hover{color:var(--ink)}
-    .nav-btn{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;background:var(--ink);color:var(--paper);text-decoration:none;padding:8px 16px;border-radius:2px;transition:.2s}
+    .nav-btn{font-family: var(--sans);font-size: 0.82rem;font-weight: 600;letter-spacing: 0;text-transform: none;background: var(--ink);color: var(--paper);text-decoration: none;padding: 8px 16px;border-radius: 4px;transition: .2s;}
     .nav-btn:hover{background:var(--accent)}
 
     /* ── HERO ── */
@@ -49,7 +54,7 @@
         max-width:var(--w);margin:0 auto;gap:64px;
     }
     .hero-left{flex:1;max-width:580px}
-    .hero-tag{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;display:block}
+    .hero-tag{font-family: var(--sans);font-size: 0.86rem;font-weight: 600;letter-spacing: 0.01em;text-transform: none;color: var(--accent);margin-bottom: 18px;display: block;}
     .hero-left h1{
     font-family:var(--serif);
     font-size:clamp(2.6rem,4.5vw,4rem);
@@ -65,7 +70,7 @@
         margin-bottom:40px;
     }
     .stat-n{display:block;font-family:var(--serif);font-size:2.2rem;line-height:1}
-    .stat-l{display:block;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--light);margin-top:4px}
+    .stat-l{display:block;font-family: var(--sans);font-size: 0.78rem;font-weight: 600;letter-spacing: 0;text-transform: none;color: var(--light);margin-top: 4px;}
     .hero-cta{
         display:inline-block;font-family:var(--mono);font-size:0.7rem;
         letter-spacing:0.1em;text-transform:uppercase;
@@ -82,7 +87,7 @@
     /* ── PROBLEM ── */
     #problem{background:var(--ink);color:var(--paper);padding:88px 32px}
     .sec-inner{max-width:var(--w);margin:0 auto}
-    .sec-tag{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(250,248,245,.4);margin-bottom:12px;display:block}
+    .sec-tag{font-family: var(--sans);font-size: 0.82rem;font-weight: 600;letter-spacing: 0.01em;text-transform: none;color: rgba(250,248,245,.55);margin-bottom: 12px;display: block;}
     .sec-h{
     font-family:var(--serif);
     font-size:clamp(1.8rem,3vw,2.6rem);
@@ -189,10 +194,19 @@
         max-width:580px;margin-bottom:0; flex-grow: 1;
     }
     .step-item{
-        flex:1;padding:11px 14px;
-        font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-        color:var(--light);border-right:1px solid var(--border);
-        display:flex;align-items:center;gap:8px;transition:.2s;
+    flex:1;
+    padding:11px 14px;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--light);
+    border-right:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    transition:.2s;
     }
     .step-item:last-child{border-right:none}
     .step-item.active{background:var(--ink);color:var(--paper)}
