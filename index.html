@@ -10,40 +10,20 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
     :root {
-        --shadow-grey: #3a2e39;
-        --ruby-red: #91272e;
-        --dark-cyan: #25938f;
-        --porcelain: #fdfff7;
-
-        --ink: var(--shadow-grey);
-        --paper: var(--porcelain);
-        --warm: #edf3eb;
-        --warm-mid: #e6eee8;
-
-        --accent: var(--ruby-red);
-        --accent-dark: #6f1d23;
-        --accent-pale: #f4e4e5;
-
-        --green: var(--dark-cyan);
-        --green-pale: #e2f3f2;
-        --blue: var(--dark-cyan);
-
-        --mid: #514750;
-        --light: #766b74;
-        --border: #d9ded2;
-
+        --ink:#1a1410; --paper:#faf8f5; --warm:#e8e2d9;
+        --accent:#c94a2a; --accent-pale:#f5e8e3; --green:#2d6a4f;
+        --mid:#4a3f35; --light:#7a6e64; --border:#d4ccc2;
         --serif:'Source Serif 4', Georgia, serif;
         --sans:'Inter', Arial, sans-serif;
         --mono:'IBM Plex Mono', monospace;
-
         --w:1200px;
+        --c-heat:#c94a2a; --c-pop:#7b2d8b; --c-socio:#b8860b;
+        --c-mental:#2d6a4f; --c-built:#1e5f8a; --c-access:#2e7d4f;
 
-        --c-heat:#91272e;
-        --c-pop:#7b2d8b;
-        --c-socio:#9b6b10;
-        --c-mental:#25938f;
-        --c-built:#236b8e;
-        --c-access:#25938f;
+        --label-font: var(--sans);
+        --label-size: 0.78rem;
+        --label-weight: 600;
+        --label-spacing: 0.01em;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -415,11 +395,83 @@
         color:var(--light);border-radius:1px;margin-top:7px;
     }
 
+    .int-group {
+        margin-bottom: 16px;
+    }
+
+    .int-group-title {
+        font-family: var(--sans);
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin: 12px 0 8px;
+    }
+
+    .local-checks {
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+        margin-top: 12px;
+    }
+
+    .local-checks ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .local-checks li {
+        font-size: 0.82rem;
+        color: var(--mid);
+        line-height: 1.5;
+        margin-bottom: 6px;
+    }
+
     /* Footer */
     footer{background:var(--ink);color:rgba(250,248,245,.4);padding:36px 32px;text-align:center}
     footer p{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em}
     footer a{color:rgba(250,248,245,.6);text-decoration:none}
     footer a:hover{color:var(--paper)}
+
+    /*driver card*/
+    .driver-card,
+    .policy-card,
+    .intervention-panel {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 16px;
+        margin-bottom: 14px;
+        background: rgba(255,255,255,0.45);
+    }
+
+    .driver-title,
+    .policy-title {
+        font-family: var(--sans);
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 10px;
+    }
+
+    .driver-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .driver-tag {
+        display: inline-block;
+        padding: 4px 7px;
+        border-radius: 3px;
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .policy-card p {
+        font-size: 0.86rem;
+        line-height: 1.55;
+        color: var(--mid);
+        margin: 0;
+    }
 
     /* Responsive */
     @media(max-width:960px){
@@ -611,8 +663,19 @@
                 <!-- Right: overview + interventions -->
                 <div>
                     <div class="overview-card" id="overviewCard"></div>
-                    <div class="int-title">Possible municipal interventions</div>
-                    <div id="intList"></div>
+
+                    <div class="driver-card" id="driverCard"></div>
+
+                    <div class="policy-card" id="policyCard"></div>
+
+                    <div class="intervention-panel">
+                        <div class="int-title">Intervention directions</div>
+                        <div class="int-note">
+                            These directions are generated from the municipality’s highest-scoring vulnerability dimensions. 
+                            They are intended as starting points for local policy discussion, not final prescriptions.
+                        </div>
+                        <div id="intList"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -661,12 +724,14 @@ const THEMES = [
 ];
 
 const RAMPS = {
-    theme_heat:         ['#fff1f2','#e9b9bd','#c76f76','#91272e','#5c151b'],
-    theme_populations:  ['#f4eff7','#d8b7df','#a665b3','#7b2d8b','#401246'],
-    theme_socioeconomic:['#fff8e6','#ead38c','#c79a2a','#9b6b10','#563905'],
-    theme_mental_health:['#e9f7f6','#b8e1df','#6bbfba','#25938f','#0f5552'],
-    theme_built_access: ['#e8f4f6','#b7dce5','#6eaec0','#236b8e','#12384d'],
-    composite:          ['#fff6dc','#eadb91','#cf9d48','#91272e','#3a2e39'],
+    theme_heat:         ['#fff5f0','#fcc5a1','#fc8c59','#e83f1b','#7f0000'],
+    theme_populations:  ['#f7f0fb','#d4a8e8','#9e4dbb','#6a1b8a','#330044'],
+    theme_socioeconomic:['#fffde7','#ffe27a','#f0a500','#b36b00','#5c3200'],
+    theme_mental_health:['#f0faf4','#a8ddb5','#43a866','#1a6e3a','#083820'],
+    theme_built_env:    ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
+    theme_access:       ['#f0faf4','#b7e4c7','#52b788','#1b7a40','#081c15'],
+    theme_built_access: ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
+    composite:          ['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'],
 };
 
 const INTERVENTIONS = {
@@ -928,11 +993,63 @@ function selectMuni(name) {
     document.getElementById('panelResults').scrollIntoView({behavior:'smooth', block:'start'});
 
     setTimeout(() => {
-        initMap(feats);
         buildOverview(feats, name);
         buildRankings(feats, activeTheme);
+        buildDriverCard(feats);
+        buildPolicyInterpretation(feats);
         buildInterventions(feats);
     }, 50);
+}
+
+function getThemeAverages(feats) {
+    const avg = arr => {
+        const v = arr.filter(x => x != null && !isNaN(x));
+        return v.length ? v.reduce((a,b) => a + b, 0) / v.length : 0;
+    };
+
+    return THEMES
+        .map(t => ({
+            ...t,
+            score: avg(feats.map(f => f.properties[t.key]))
+        }))
+        .sort((a,b) => b.score - a.score);
+}
+
+function buildDriverCard(feats) {
+    const top = getThemeAverages(feats).slice(0, 3);
+
+    document.getElementById('driverCard').innerHTML = `
+        <div class="driver-title">Main vulnerability drivers</div>
+        <div class="driver-tags">
+            ${top.map(t => `
+                <span class="driver-tag" style="background:${t.color}">
+                    ${t.label} · ${Math.round(t.score)}
+                </span>
+            `).join('')}
+        </div>
+    `;
+}
+
+function buildPolicyInterpretation(feats) {
+    const top = getThemeAverages(feats).slice(0, 2).map(t => t.key);
+    let text = 'This municipality shows elevated relative heat-health vulnerability. Local interpretation should combine the map results with municipal knowledge and GGD expertise.';
+
+    const has = key => top.includes(key);
+
+    if (has('theme_heat') && has('theme_built_access')) {
+        text = 'High heat exposure overlaps with built-environment and access constraints. This suggests that cooling infrastructure, shaded routes, housing adaptation, and access to safe public cooling spaces may be especially relevant.';
+    } else if (has('theme_populations') && has('theme_mental_health')) {
+        text = 'Population sensitivity overlaps with mental-health or social-isolation indicators. This suggests a need for proactive outreach, welfare checks, and coordination with care and neighbourhood networks during heat events.';
+    } else if (has('theme_socioeconomic') && has('theme_built_access')) {
+        text = 'Socioeconomic deprivation overlaps with built-environment and access constraints. This suggests that residents may face financial, legal, or infrastructural barriers to adapting without public support.';
+    } else if (has('theme_heat') && has('theme_populations')) {
+        text = 'High heat exposure overlaps with physiologically vulnerable groups. This suggests a need to prioritise heat-health communication, cooling access, and targeted support for elderly residents, children, and people with frail health.';
+    }
+
+    document.getElementById('policyCard').innerHTML = `
+        <div class="policy-title">Policy interpretation</div>
+        <p>${text}</p>
+    `;
 }
 
 function backToMuniList() {
@@ -1037,30 +1154,54 @@ function buildOverview(feats, name) {
 // INTERVENTIONS (based on 3 worst themes)
 // ═══════════════════════════════════════════════════════════
 function buildInterventions(feats) {
-    const avg = arr => { const v=arr.filter(x=>x!=null&&!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; };
-    const worst3 = THEMES
-        .map(t => ({key:t.key, score:avg(feats.map(f=>f.properties[t.key]))}))
-        .sort((a,b)=>b.score-a.score).slice(0,3).map(x=>x.key);
+    const topKeys = getThemeAverages(feats).slice(0, 3).map(t => t.key);
+    const items = [];
 
-    const container = document.getElementById('intList');
-    container.innerHTML = '';
-    worst3.forEach(key => {
+    topKeys.forEach(key => {
         const cfg = INTERVENTIONS[key];
         if (!cfg) return;
         cfg.items.slice(0, 2).forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'int-card';
-            card.innerHTML = `
-                <div class="int-bar" style="background:${cfg.color}"></div>
-                <div class="int-body">
-                    <span class="int-theme">${cfg.label}</span>
-                    <div class="int-name">${item.name}</div>
-                    <div class="int-desc">${item.desc}</div>
-                    <span class="int-type">${item.type}</span>
-                </div>`;
-            container.appendChild(card);
+            items.push({...item, theme: cfg.label, color: cfg.color});
         });
     });
+
+    const immediate = items.filter(i => ['Services', 'Policy', 'Financial'].includes(i.type)).slice(0, 3);
+    const structural = items.filter(i => ['Infrastructure', 'Housing'].includes(i.type)).slice(0, 3);
+
+    document.getElementById('intList').innerHTML = `
+        <div class="int-group">
+            <div class="int-group-title">Immediate response</div>
+            ${immediate.map(renderInterventionItem).join('')}
+        </div>
+
+        <div class="int-group">
+            <div class="int-group-title">Structural adaptation</div>
+            ${structural.map(renderInterventionItem).join('')}
+        </div>
+
+        <div class="local-checks">
+            <div class="int-group-title">Check locally before action</div>
+            <ul>
+                <li>Are vulnerable residents reachable through existing care or neighbourhood networks?</li>
+                <li>Are cooling spaces accessible on foot or by public transport?</li>
+                <li>Do housing ownership patterns affect what municipalities can implement?</li>
+            </ul>
+        </div>
+    `;
+}
+
+function renderInterventionItem(item) {
+    return `
+        <div class="int-card">
+            <div class="int-bar" style="background:${item.color}"></div>
+            <div class="int-body">
+                <span class="int-theme">${item.theme}</span>
+                <div class="int-name">${item.name}</div>
+                <div class="int-desc">${item.desc}</div>
+                <span class="int-type">${item.type}</span>
+            </div>
+        </div>
+    `;
 }
 
 // ═══════════════════════════════════════════════════════════
