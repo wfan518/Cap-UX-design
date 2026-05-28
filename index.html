@@ -799,6 +799,8 @@
                     <div class="policy-card" id="policyCard"></div>
 
                     <div class="intervention-panel">
+
+                    <div class="intervention-panel">
                         <div class="int-title">Intervention directions</div>
                         <div class="int-note">
                             These directions are generated from the municipality’s highest-scoring vulnerability dimensions. 
@@ -1132,16 +1134,16 @@ function selectMuni(name) {
         buildOverview(feats, name);
         buildRankings(feats, activeTheme);
 
-        try { buildMunicipalityBriefing(feats, name); } 
+        try { buildMunicipalityBriefing(feats, name); }
         catch (e) { console.error('Briefing failed:', e); }
 
-        try { buildDriverCard(feats); } 
+        try { buildDriverCard(feats); }
         catch (e) { console.error('Driver card failed:', e); }
 
-        try { buildPolicyInterpretation(feats); } 
+        try { buildPolicyInterpretation(feats); }
         catch (e) { console.error('Policy interpretation failed:', e); }
 
-        try { buildInterventions(feats); } 
+        try { buildInterventions(feats); }
         catch (e) { console.error('Interventions failed:', e); }
 
     }, 100);
@@ -1160,7 +1162,6 @@ function getThemeAverages(feats) {
         }))
         .sort((a,b) => b.score - a.score);
 }
-
 
 function getRelativeRiskLevel(muniName, comp) {
     if (!activeProv || !geoData) {
@@ -1188,6 +1189,7 @@ function getRelativeRiskLevel(muniName, comp) {
     return 'moderate';
 }
 
+
 function buildMunicipalityBriefing(feats, name) {
     const avg = arr => {
         const v = arr.filter(x => x != null && !isNaN(x));
@@ -1197,17 +1199,10 @@ function buildMunicipalityBriefing(feats, name) {
     const comp = Math.round(avg(feats.map(f => f.properties.risk_2025_baseline)));
     const top = getThemeAverages(feats).slice(0, 2);
     const topNames = top.map(t => t.label).join(' and ');
-    const riskLevel = getRelativeRiskLevel(name, comp);
 
-    document.getElementById('briefingCard').innerHTML = `
-        <div class="briefing-title">Municipality briefing</div>
-        <p>
-            <strong>${name}</strong> is positioned as a <strong>${riskLevel}</strong>-priority municipality 
-            within the selected province in the current baseline. The strongest local signals are 
-            <strong>${topNames}</strong>, which can help guide where interpretation and follow-up discussion should begin.
-        </p>
-    `;
-}
+    let riskLevel = getRelativeRiskLevel(name, comp);
+
+    
 
     document.getElementById('briefingCard').innerHTML = `
         <div class="briefing-title">Municipality briefing</div>
