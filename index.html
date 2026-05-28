@@ -799,8 +799,6 @@
                     <div class="policy-card" id="policyCard"></div>
 
                     <div class="intervention-panel">
-
-                    <div class="intervention-panel">
                         <div class="int-title">Intervention directions</div>
                         <div class="int-note">
                             These directions are generated from the municipality’s highest-scoring vulnerability dimensions. 
@@ -1133,10 +1131,18 @@ function selectMuni(name) {
 
         buildOverview(feats, name);
         buildRankings(feats, activeTheme);
-        buildMunicipalityBriefing(feats, name);
-        buildDriverCard(feats);
-        buildPolicyInterpretation(feats);
-        buildInterventions(feats);
+
+        try { buildMunicipalityBriefing(feats, name); } 
+        catch (e) { console.error('Briefing failed:', e); }
+
+        try { buildDriverCard(feats); } 
+        catch (e) { console.error('Driver card failed:', e); }
+
+        try { buildPolicyInterpretation(feats); } 
+        catch (e) { console.error('Policy interpretation failed:', e); }
+
+        try { buildInterventions(feats); } 
+        catch (e) { console.error('Interventions failed:', e); }
 
     }, 100);
 }
@@ -1156,6 +1162,32 @@ function getThemeAverages(feats) {
 }
 
 
+function getRelativeRiskLevel(muniName, comp) {
+    if (!activeProv || !geoData) {
+        if (comp >= 70) return 'high';
+        if (comp >= 55) return 'elevated';
+        if (comp < 40) return 'lower';
+        return 'moderate';
+    }
+
+    const rankings = rankGemeenten(activeProv.gemeenten, 'composite');
+    const index = rankings.findIndex(gm => gm.name === muniName);
+
+    if (index === -1 || rankings.length < 4) {
+        if (comp >= 70) return 'high';
+        if (comp >= 55) return 'elevated';
+        if (comp < 40) return 'lower';
+        return 'moderate';
+    }
+
+    const percentile = index / (rankings.length - 1);
+
+    if (percentile <= 0.2) return 'high';
+    if (percentile <= 0.4) return 'elevated';
+    if (percentile >= 0.8) return 'lower';
+    return 'moderate';
+}
+
 function buildMunicipalityBriefing(feats, name) {
     const avg = arr => {
         const v = arr.filter(x => x != null && !isNaN(x));
@@ -1165,17 +1197,24 @@ function buildMunicipalityBriefing(feats, name) {
     const comp = Math.round(avg(feats.map(f => f.properties.risk_2025_baseline)));
     const top = getThemeAverages(feats).slice(0, 2);
     const topNames = top.map(t => t.label).join(' and ');
-
-    let riskLevel = getRelativeRiskLevel(name, comp);
-
-    
+    const riskLevel = getRelativeRiskLevel(name, comp);
 
     document.getElementById('briefingCard').innerHTML = `
         <div class="briefing-title">Municipality briefing</div>
         <p>
-            <strong>${name}</strong> shows a <strong>${riskLevel}</strong> relative heat-health vulnerability profile 
-            in the current baseline. The strongest signals in this municipality are 
-            <strong>${topNames}</strong>, which can help guide where local interpretation and follow-up discussion should begin.
+            <strong>${name}</strong> is positioned as a <strong>${riskLevel}</strong>-priority municipality 
+            within the selected province in the current baseline. The strongest local signals are 
+            <strong>${topNames}</strong>, which can help guide where interpretation and follow-up discussion should begin.
+        </p>
+    `;
+}
+
+    document.getElementById('briefingCard').innerHTML = `
+        <div class="briefing-title">Municipality briefing</div>
+        <p>
+            <strong>${name}</strong> is positioned as a <strong>${riskLevel}</strong>-priority municipality 
+            within the selected province in the current baseline. The strongest local signals are 
+            <strong>${topNames}</strong>, which can help guide where interpretation and follow-up discussion should begin.
         </p>
     `;
 }
