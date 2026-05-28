@@ -993,12 +993,18 @@ function selectMuni(name) {
     document.getElementById('panelResults').scrollIntoView({behavior:'smooth', block:'start'});
 
     setTimeout(() => {
+        initMap(feats);
+
+        if (rMap) {
+            rMap.invalidateSize();
+        }
+
         buildOverview(feats, name);
         buildRankings(feats, activeTheme);
         buildDriverCard(feats);
         buildPolicyInterpretation(feats);
         buildInterventions(feats);
-    }, 50);
+    }, 100);
 }
 
 function getThemeAverages(feats) {
@@ -1120,7 +1126,7 @@ function buildRankings(feats, theme) {
         .slice(0, 10);
 
     const list = document.getElementById('rankList');
-    list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Worst neighborhoods — ${theme.label}</div>`;
+    list.innerHTML = `<div style="font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px">Highest vulnerability neighbourhoods — ${theme.label}</div>`;
     sorted.forEach((f,i) => {
         const s = Math.round(f.properties[theme.key]);
         const row = document.createElement('div');
