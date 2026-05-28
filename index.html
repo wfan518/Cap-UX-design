@@ -148,6 +148,100 @@
         color:var(--accent);
     }
 
+    /* ── PROBLEM RESTRUCTURE ── */
+    .problem-layout {
+        display: grid;
+        grid-template-columns: 0.9fr 1.6fr;
+        gap: 56px;
+        align-items: start;
+    }
+
+    .problem-intro {
+        position: sticky;
+        top: 96px;
+    }
+
+    .problem-intro .sec-sub {
+        margin-bottom: 0;
+    }
+
+    .problem-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .problem-card {
+        min-height: 260px;
+        padding: 28px 26px;
+        border: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.035);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .problem-card .p-num {
+        font-family: var(--serif);
+        font-size: 2.4rem;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 14px;
+        opacity: .65;
+    }
+
+    .problem-card h3 {
+        font-family: var(--serif);
+        font-size: 1.18rem;
+        color: var(--paper);
+        margin-bottom: 12px;
+        line-height: 1.18;
+    }
+
+    .problem-card p {
+        font-size: .88rem;
+        color: rgba(250,248,245,.65);
+        line-height: 1.6;
+    }
+
+    .problem-card .p-stat {
+        margin-top: auto;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255,255,255,.08);
+        font-family: var(--sans);
+        font-size: .72rem;
+        font-weight: 600;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--accent);
+        line-height: 1.45;
+    }
+
+    @media(max-width:960px){
+        .problem-layout {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        .problem-intro {
+            position: static;
+        }
+    }
+
+    @media(max-width:680px){
+        .problem-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .problem-card {
+            min-height: auto;
+        }
+    }
+
+    .problem-card-emphasis {
+    background: rgba(201,74,42,0.08);
+    border-color: rgba(201,74,42,0.22);
+    }
+
     /* ── EXPLORER ── */
     #explorer{padding:88px 32px}
 
@@ -536,31 +630,46 @@
 
 <!-- ═══════════ PROBLEM ═══════════ -->
 <section id="problem">
-    <div class="sec-inner">
-        <span class="sec-tag">The policy problem</span>
-        <h2 class="sec-h">Heat-health risk is uneven,<br>local, and preventable</h2>
-        <p class="sec-sub">
-           Rising temperatures do not affect all neighbourhoods equally. Vulnerability is shaped by exposure, age, income, health conditions, housing quality, green space, and access to support.
-        </p>
-        <div class="pillars">
-            <div class="pillar">
+    <div class="sec-inner problem-layout">
+        <div class="problem-intro">
+            <span class="sec-tag">The policy problem</span>
+            <h2 class="sec-h">Heat-health risk is uneven, local, and preventable</h2>
+            <p class="sec-sub">
+                Rising temperatures do not affect all neighbourhoods equally. Vulnerability is shaped by exposure, age, income, health conditions, housing quality, green space, and access to support.
+            </p>
+        </div>
+
+        <div class="problem-grid">
+            <div class="problem-card">
                 <div class="p-num">01</div>
                 <h3>Heat exposure is spatially unequal</h3>
-                <p>Dense urban neighborhoods with little vegetation and high shares of dark surfaces experience Physiological Equivalent Temperatures up to 8°C higher than surrounding areas. Green space, parks, and water reduce this — but are unequally distributed across the country.</p>
-                <div class="p-stat">↑ 8°C PET gap between most and least exposed neighborhoods in major cities</div>
+                <p>Dense urban neighbourhoods with little vegetation and high shares of dark surfaces experience substantially higher heat stress than surrounding areas.</p>
+                <div class="p-stat">Urban heat is distributed unevenly across neighbourhoods</div>
             </div>
-            <div class="pillar">
+
+            <div class="problem-card">
                 <div class="p-num">02</div>
-                <h3>The most vulnerable cannot adapt alone</h3>
-                <p>Elderly residents, young children, people with frail health, and those experiencing chronic stress or loneliness face compounding barriers to self-protection. Low incomes mean no access to cooling, while social isolation means no one to check in during heat alerts.</p>
-                <div class="p-stat">↑ 3× higher hospitalization rate for residents aged 75+ during heat waves</div>
+                <h3>Vulnerability is socially patterned</h3>
+                <p>Elderly residents, children, people with frail health, low-income households, and socially isolated residents face compounding barriers to self-protection.</p>
+                <div class="p-stat">Heat risk increases where exposure and social vulnerability overlap</div>
             </div>
-            <div class="pillar">
+
+            <div class="problem-card">
                 <div class="p-num">03</div>
                 <h3>Housing and infrastructure shape indoor risk</h3>
-                <p>Neighborhoods dominated by pre-2010 housing — built before modern thermal insulation standards — become indoor heat traps during prolonged heat events. Rental-heavy neighborhoods offer residents little control over retrofitting or installing cooling.</p>
-                <div class="p-stat">↑ Pre-2010 buildings show highest rates of inability to find indoor cooling</div>
+                <p>Older housing, limited green space, poor access to cooling locations, and rental constraints can turn heat exposure into a local public-health problem.</p>
+                <div class="p-stat">Built environments can either reduce or amplify heat-health risk</div>
             </div>
+
+            <div class="problem-card">
+                <div class="p-num">04</div>
+                <h3>Heat-health risk competes for policy attention</h3>
+                <p>Dutch climate adaptation has long been shaped by collective experience with water and flood protection. Heat-health risks are newer, less visible, and harder to fit into established municipal routines.</p>
+                <div class="p-stat">The challenge is not only data, but policy interpretation</div>
+            </div>
+
+            <div class="problem-card problem-card-emphasis"></div>
+
         </div>
     </div>
 </section>
