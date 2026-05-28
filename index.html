@@ -1166,10 +1166,9 @@ function buildMunicipalityBriefing(feats, name) {
     const top = getThemeAverages(feats).slice(0, 2);
     const topNames = top.map(t => t.label).join(' and ');
 
-    let riskLevel = 'moderate';
-    if (comp >= 70) riskLevel = 'high';
-    else if (comp >= 55) riskLevel = 'elevated';
-    else if (comp < 40) riskLevel = 'lower';
+    let riskLevel = getRelativeRiskLevel(name, comp);
+
+    
 
     document.getElementById('briefingCard').innerHTML = `
         <div class="briefing-title">Municipality briefing</div>
