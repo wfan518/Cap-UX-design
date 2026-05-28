@@ -12,32 +12,36 @@
 
     <style>
         :root {
-            --ink: #1a1410;
-            --paper: #faf8f5;
-            --warm-mid: #e8e2d9;
-            --accent: #c94a2a;
-            --accent-dark: #8b2a12;
-            --accent-pale: #f5e8e3;
-            --green: #2d6a4f;
-            --text-mid: #4a3f35;
-            --text-light: #7a6e64;
-            --border: #d4ccc2;
+            --shadow-grey: #3a2e39;
+            --ruby-red: #91272e;
+            --dark-cyan: #25938f;
+            --porcelain: #fdfff7;
+
+            --ink: var(--shadow-grey);
+            --paper: var(--porcelain);
+            --warm-mid: #e6eee8;
+
+            --accent: var(--ruby-red);
+            --accent-dark: #6f1d23;
+            --accent-pale: #f4e4e5;
+
+            --green: var(--dark-cyan);
+            --green-pale: #e2f3f2;
+
+            --text-mid: #514750;
+            --text-light: #766b74;
+            --border: #d9ded2;
+
             --serif: 'Source Serif 4', Georgia, serif;
             --sans: 'Inter', Arial, sans-serif;
             --mono: 'IBM Plex Mono', monospace;
 
-            --label-font: var(--sans);
-            --label-size: 0.78rem;
-            --label-weight: 600;
-            --label-spacing: 0.01em;
-
-            --c-heat:    #c94a2a;
+            --c-heat:    #91272e;
             --c-pop:     #7b2d8b;
-            --c-socio:   #b8860b;
-            --c-mental:  #2d6a4f;
-            --c-built:   #1e5f8a;
-            --c-access:  #2e7d4f;
-            --c-composite: #1a1410;
+            --c-socio:   #9b6b10;
+            --c-mental:  #25938f;
+            --c-built:   #236b8e;
+            --c-composite: #3a2e39;
         }
 
         * { box-sizing: border-box; }
@@ -343,12 +347,12 @@ const POPUP_THEMES = [
 
 // ─── COLOR RAMPS (index 0 = safe/low, index 4 = critical/high) ───────────────
 const RAMPS = {
-    composite:    ['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'],
-    heat:         ['#fff5f0','#fcc5a1','#fc8c59','#e83f1b','#7f0000'],
-    populations:  ['#f7f0fb','#d4a8e8','#9e4dbb','#6a1b8a','#330044'],
-    socioeconomic:['#fffde7','#ffe27a','#f0a500','#b36b00','#5c3200'],
-    mental_health:['#f0faf4','#a8ddb5','#43a866','#1a6e3a','#083820'],
-    built_access: ['#edf5fc','#9bc9e8','#3f8dc4','#1a5c90','#072a46'],
+    composite:     ['#fff6dc','#eadb91','#cf9d48','#91272e','#3a2e39'],
+    heat:          ['#fff1f2','#e9b9bd','#c76f76','#91272e','#5c151b'],
+    populations:   ['#f4eff7','#d8b7df','#a665b3','#7b2d8b','#401246'],
+    socioeconomic: ['#fff8e6','#ead38c','#c79a2a','#9b6b10','#563905'],
+    mental_health: ['#e9f7f6','#b8e1df','#6bbfba','#25938f','#0f5552'],
+    built_access:  ['#e8f4f6','#b7dce5','#6eaec0','#236b8e','#12384d'],
 };
 
 function rampColor(score, themeName) {
