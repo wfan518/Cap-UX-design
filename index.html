@@ -526,6 +526,7 @@
     footer a:hover{color:var(--paper)}
 
     /*driver card*/
+    .briefing-card,
     .driver-card,
     .policy-card,
     .intervention-panel {
@@ -534,6 +535,26 @@
         padding: 16px;
         margin-bottom: 14px;
         background: rgba(255,255,255,0.45);
+    }
+
+    .briefing-title {
+        font-family: var(--sans);
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 8px;
+    }
+
+    .briefing-card p {
+        font-size: 0.88rem;
+        line-height: 1.58;
+        color: var(--mid);
+        margin: 0;
+    }
+
+    .briefing-card strong {
+        color: var(--ink);
+        font-weight: 700;
     }
 
     .driver-title,
@@ -771,9 +792,13 @@
                 <div>
                     <div class="overview-card" id="overviewCard"></div>
 
+                    <div class="briefing-card" id="briefingCard"></div>
+
                     <div class="driver-card" id="driverCard"></div>
 
                     <div class="policy-card" id="policyCard"></div>
+
+                    <div class="intervention-panel">
 
                     <div class="intervention-panel">
                         <div class="int-title">Intervention directions</div>
@@ -1108,9 +1133,11 @@ function selectMuni(name) {
 
         buildOverview(feats, name);
         buildRankings(feats, activeTheme);
+        buildMunicipalityBriefing(feats, name);
         buildDriverCard(feats);
         buildPolicyInterpretation(feats);
         buildInterventions(feats);
+
     }, 100);
 }
 
@@ -1126,6 +1153,32 @@ function getThemeAverages(feats) {
             score: avg(feats.map(f => f.properties[t.key]))
         }))
         .sort((a,b) => b.score - a.score);
+}
+
+
+function buildMunicipalityBriefing(feats, name) {
+    const avg = arr => {
+        const v = arr.filter(x => x != null && !isNaN(x));
+        return v.length ? v.reduce((a,b) => a + b, 0) / v.length : 0;
+    };
+
+    const comp = Math.round(avg(feats.map(f => f.properties.risk_2025_baseline)));
+    const top = getThemeAverages(feats).slice(0, 2);
+    const topNames = top.map(t => t.label).join(' and ');
+
+    let riskLevel = 'moderate';
+    if (comp >= 70) riskLevel = 'high';
+    else if (comp >= 55) riskLevel = 'elevated';
+    else if (comp < 40) riskLevel = 'lower';
+
+    document.getElementById('briefingCard').innerHTML = `
+        <div class="briefing-title">Municipality briefing</div>
+        <p>
+            <strong>${name}</strong> shows a <strong>${riskLevel}</strong> relative heat-health vulnerability profile 
+            in the current baseline. The strongest signals in this municipality are 
+            <strong>${topNames}</strong>, which can help guide where local interpretation and follow-up discussion should begin.
+        </p>
+    `;
 }
 
 function buildDriverCard(feats) {
@@ -1144,8 +1197,11 @@ function buildDriverCard(feats) {
 }
 
 function buildPolicyInterpretation(feats) {
-    const top = getThemeAverages(feats).slice(0, 2).map(t => t.key);
-    let text = 'This municipality shows elevated relative heat-health vulnerability. Local interpretation should combine the map results with municipal knowledge and GGD expertise.';
+    const topDims = getThemeAverages(feats).slice(0, 2);
+    const top = topDims.map(t => t.key);
+    const topNames = topDims.map(t => t.label.toLowerCase()).join(' and ');
+
+    let text = `This profile should be read as a starting point for local interpretation. The strongest signals are ${topNames}, but the practical meaning of these scores depends on local context, existing services, housing conditions, and GGD or municipal knowledge.`;
 
     const has = key => top.includes(key);
 
