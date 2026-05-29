@@ -529,6 +529,7 @@
     .briefing-card,
     .driver-card,
     .policy-card,
+    .future-card,
     .intervention-panel {
         border: 1px solid var(--border);
         border-radius: 4px;
@@ -584,6 +585,48 @@
     .policy-card p {
         font-size: 0.86rem;
         line-height: 1.55;
+        color: var(--mid);
+        margin: 0;
+    }
+
+    .future-title {
+        font-family: var(--sans);
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 10px;
+    }
+
+    .future-note {
+        font-size: 0.84rem;
+        line-height: 1.55;
+        color: var(--mid);
+        margin-bottom: 12px;
+    }
+
+    .future-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .future-step {
+        border-left: 3px solid var(--accent);
+        padding-left: 10px;
+    }
+
+    .future-year {
+        display: block;
+        font-family: var(--sans);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 2px;
+    }
+
+    .future-step p {
+        font-size: 0.8rem;
+        line-height: 1.45;
         color: var(--mid);
         margin: 0;
     }
@@ -797,6 +840,8 @@
                     <div class="driver-card" id="driverCard"></div>
 
                     <div class="policy-card" id="policyCard"></div>
+
+                    <div class="future-card" id="futureCard"></div>
 
                     <div class="intervention-panel">
 
@@ -1143,6 +1188,9 @@ function selectMuni(name) {
         try { buildPolicyInterpretation(feats); }
         catch (e) { console.error('Policy interpretation failed:', e); }
 
+        try { buildFuturePressurePoints(feats); }
+        catch (e) { console.error('Future pressure points failed:', e); }
+
         try { buildInterventions(feats); }
         catch (e) { console.error('Interventions failed:', e); }
 
@@ -1251,6 +1299,62 @@ function buildPolicyInterpretation(feats) {
     document.getElementById('policyCard').innerHTML = `
         <div class="policy-title">Policy interpretation</div>
         <p>${text}</p>
+    `;
+}
+
+function buildFuturePressurePoints(feats) {
+    const topDims = getThemeAverages(feats).slice(0, 3);
+    const topKeys = topDims.map(t => t.key);
+    const has = key => topKeys.includes(key);
+
+    let pressureText = 'Future heat scenarios should be read as pressure signals rather than exact forecasts. The key question is whether current vulnerability patterns may become harder to manage under more frequent or intense heat events.';
+
+    let nearTerm = 'Use the current baseline to identify neighbourhoods where vulnerability is already concentrated and where existing municipal or GGD services may need to be checked.';
+    let midTerm = 'If heat exposure increases, prioritise measures that can be implemented before repeated heat events turn seasonal risk into recurring public-health pressure.';
+    let longTerm = 'Long-term adaptation should focus on structural changes that reduce vulnerability before future heat scenarios become harder to manage.';
+
+    if (has('theme_heat') && has('theme_built_access')) {
+        pressureText = 'The main future pressure point is the overlap between outdoor heat exposure and the physical environment. Without earlier adaptation, hot neighbourhoods with limited cooling access may become recurring heat-stress zones.';
+        nearTerm = 'Map accessible cooling spaces and identify shaded routes around the most exposed neighbourhoods.';
+        midTerm = 'Prioritise shade, cool public routes, green-blue infrastructure, and cooling access before heat events become more frequent.';
+        longTerm = 'Plan housing retrofit and neighbourhood redesign to reduce indoor and outdoor heat accumulation over time.';
+    } else if (has('theme_populations') && has('theme_mental_health')) {
+        pressureText = 'The main future pressure point is the overlap between physiological vulnerability and weak social support. As heat events intensify, isolated residents may become harder to reach through standard warning systems.';
+        nearTerm = 'Identify care networks, neighbourhood organisations, and communication channels that can reach vulnerable residents.';
+        midTerm = 'Develop proactive heatwave outreach and welfare-check protocols with GGD, GP, and community partners.';
+        longTerm = 'Build year-round social infrastructure so heatwave response does not depend only on emergency communication.';
+    } else if (has('theme_socioeconomic') && has('theme_built_access')) {
+        pressureText = 'The main future pressure point is adaptive capacity. Residents may face financial, housing, or access barriers that make future heat events harder to manage without public support.';
+        nearTerm = 'Identify where residents may lack affordable cooling options or access to nearby public cooling spaces.';
+        midTerm = 'Target low-cost cooling support, multilingual communication, and landlord engagement in high-vulnerability neighbourhoods.';
+        longTerm = 'Connect heat adaptation to housing quality, affordability, and infrastructure investment.';
+    } else if (has('theme_heat') && has('theme_populations')) {
+        pressureText = 'The main future pressure point is the overlap between high heat exposure and heat-sensitive populations. This combination may require earlier preventive action before extreme heat becomes routine.';
+        nearTerm = 'Locate neighbourhoods where elderly residents, children, or frail-health groups overlap with high heat exposure.';
+        midTerm = 'Strengthen heat-health communication, cooling access, and targeted outreach before future heat seasons.';
+        longTerm = 'Integrate heat-health vulnerability into municipal planning, care coordination, and neighbourhood adaptation.';
+    }
+
+    document.getElementById('futureCard').innerHTML = `
+        <div class="future-title">Future pressure points</div>
+        <p class="future-note">${pressureText}</p>
+
+        <div class="future-timeline">
+            <div class="future-step">
+                <span class="future-year">2025 baseline</span>
+                <p>${nearTerm}</p>
+            </div>
+
+            <div class="future-step">
+                <span class="future-year">2050 intervention window</span>
+                <p>${midTerm}</p>
+            </div>
+
+            <div class="future-step">
+                <span class="future-year">2075 structural adaptation</span>
+                <p>${longTerm}</p>
+            </div>
+        </div>
     `;
 }
 
