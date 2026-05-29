@@ -50,6 +50,15 @@
         letter-spacing: -0.015em;
         text-transform: none;
         color: var(--ink);
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .nav-logo:hover {
+        color: var(--accent);
+    }
+
+    .nav-logo:hover .logo-mark {
+        transform: scale(1.12);
     }
     .logo-mark {
         width: 10px;
@@ -57,6 +66,7 @@
         border-radius: 999px;
         background: var(--accent);
         display: inline-block;
+        transition: transform .18s ease;
     }
     .nav-links{display:flex;gap:20px;align-items:center}
      .nav-lk {
